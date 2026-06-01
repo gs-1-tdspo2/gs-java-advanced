@@ -94,6 +94,14 @@ public class EstacaoIotService {
 				.orElseThrow(() -> new ResourceNotFoundException("Estação IoT ativa não encontrada: " + idEstacao));
 	}
 
+	@Transactional(readOnly = true)
+	public EstacaoIot buscarAtivaPorCodigo(String codigoEstacao) {
+		return estacaoRepository.findByCodigoEstacao(codigoEstacao)
+				.filter(estacao -> ATIVO.equals(estacao.getStAtivo()))
+				.orElseThrow(() -> new ResourceNotFoundException(
+						"Estação IoT ativa não encontrada para o código: " + codigoEstacao));
+	}
+
 	private void validarCodigoUnico(String codigoEstacao, Long idEstacaoAtual) {
 		estacaoRepository.findByCodigoEstacao(codigoEstacao)
 				.filter(estacao -> !estacao.getIdEstacao().equals(idEstacaoAtual))
