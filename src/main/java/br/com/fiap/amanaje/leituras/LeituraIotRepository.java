@@ -9,6 +9,8 @@ public interface LeituraIotRepository extends JpaRepository<LeituraIot, Long> {
 
 	List<LeituraIot> findByIdRegiaoOrderByDtLeituraDesc(Long idRegiao);
 
+	List<LeituraIot> findByStValida(String stValida);
+
 	Optional<LeituraIot> findFirstByIdRegiaoAndStValidaOrderByDtLeituraDesc(Long idRegiao, String stValida);
 
 }

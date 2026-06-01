@@ -9,6 +9,8 @@ public interface EstacaoIotRepository extends JpaRepository<EstacaoIot, Long> {
 
 	List<EstacaoIot> findByIdRegiaoAndStAtivo(Long idRegiao, String stAtivo);
 
+	List<EstacaoIot> findByStAtivo(String stAtivo);
+
 	Optional<EstacaoIot> findByCodigoEstacao(String codigoEstacao);
 
 }

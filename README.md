@@ -17,7 +17,7 @@ API principal do projeto Amanajé Global Solution 2026/1 para monitoramento clim
 
 ## Fase atual
 
-REST API demonstrável para clientes, regiões monitoradas, estações IoT, telemetria, observações climáticas, avaliação de risco e alertas.
+REST API demonstrável para clientes, regiões monitoradas, estações IoT, telemetria, observações climáticas, avaliação de risco, alertas, dashboard e indicadores regionais.
 
 As entidades JPA estão alinhadas ao DDL Oracle, que permanece como fonte de verdade do banco de dados. Os relacionamentos regionais são validados pela API com IDs simples nesta fase.
 
@@ -119,6 +119,22 @@ A avaliação de risco usa a leitura IoT válida mais recente e a observação c
 
 Filtros opcionais em `GET /api/alertas`: `idRegiao`, `status` e `nivel`.
 
+### Dashboard
+
+- `GET /api/dashboard/summary`
+
+Filtro opcional em `GET /api/dashboard/summary`: `idCliente`.
+
+O resumo do dashboard agrega os dados operacionais atuais persistidos no backend.
+
+### Indicadores regionais
+
+- `GET /api/indicadores-regionais`
+
+Filtros opcionais em `GET /api/indicadores-regionais`: `estado`, `cidade`, `tipoRisco` e `nivelRiscoMedio`.
+
+Os indicadores regionais são retornados a partir dos registros persistidos e podem ser preenchidos posteriormente por DML, PL/SQL ou pelo fluxo da aplicação.
+
 ## Próximas fases
 
-Dashboard e integrações adicionais serão implementados nas próximas fases.
+Integrações adicionais serão implementadas nas próximas fases.
