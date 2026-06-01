@@ -75,6 +75,18 @@ No Windows:
 - `PUT /api/clientes/{id}`
 - `DELETE /api/clientes/{id}`
 
+### Usuários
+
+- `POST /api/usuarios`
+- `GET /api/usuarios`
+- `GET /api/usuarios/{id}`
+- `PUT /api/usuarios/{id}`
+- `DELETE /api/usuarios/{id}`
+
+Filtro opcional em `GET /api/usuarios`: `idCliente`.
+
+O CRUD de usuários é uma administração básica do MVP. Ele não implementa login, JWT ou autenticação. O campo `senhaHash` é aceito para compatibilidade de persistência, mas não é retornado nas respostas.
+
 ### Regiões monitoradas
 
 - `POST /api/regioes`
