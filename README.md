@@ -28,11 +28,19 @@ Configure as seguintes variáveis antes de executar a aplicação:
 | Variável | Obrigatória | Descrição |
 | --- | --- | --- |
 | `SERVER_PORT` | Não | Porta HTTP. O valor padrão é `8080`. |
-| `DB_URL` | Sim | URL JDBC do banco Oracle. |
-| `DB_USERNAME` | Sim | Usuário do banco Oracle. |
-| `DB_PASSWORD` | Sim | Senha do banco Oracle. |
+| `DB_URL` | Recomendado | URL JDBC do banco Oracle. |
+| `DB_USERNAME` | Recomendado | Usuário do banco Oracle. |
+| `DB_PASSWORD` | Recomendado | Senha do banco Oracle. |
 
-A aplicação usa Oracle e não cria nem atualiza o schema automaticamente. O DDL deve ser aplicado separadamente. A execução local da aplicação requer uma configuração Oracle válida.
+A aplicação usa somente Oracle e valida o schema existente sem criar ou atualizar tabelas automaticamente. O DDL deve ser aplicado separadamente antes da execução da API.
+
+Para produção ou uso real, configure `DB_URL`, `DB_USERNAME` e `DB_PASSWORD` por variáveis de ambiente. O `application.yml` inclui valores fallback da conexão Oracle FIAP apenas para facilitar a execução escolar e demonstrativa.
+
+## Validação Oracle FIAP
+
+A aplicação está configurada com `spring.jpa.hibernate.ddl-auto=validate` para validar o schema no Oracle FIAP. O DDL deve ser aplicado no schema configurado antes de iniciar a API. As variáveis de ambiente podem substituir a conexão padrão da sala de aula.
+
+Se a inicialização falhar com erros de tabela ou coluna ausente, o DDL não foi aplicado corretamente ou algum mapeamento da entidade não corresponde ao banco de dados.
 
 Nenhum dado inicial é incluído automaticamente. A API não executa carga de dados, seed ou inicialização por `CommandLineRunner`.
 
