@@ -1,13 +1,13 @@
-package br.com.fiap.api_amanaje;
+package br.com.fiap.amanaje;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ApiAmanajeApplication {
+public class AmanajeApiApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ApiAmanajeApplication.class, args);
+		SpringApplication.run(AmanajeApiApplication.class, args);
 	}
 
 }
