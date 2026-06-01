@@ -11,4 +11,8 @@ public interface AvaliacaoRiscoRepository extends JpaRepository<AvaliacaoRisco, 
 
 	Optional<AvaliacaoRisco> findFirstByIdRegiaoOrderByDtAvaliacaoDesc(Long idRegiao);
 
+	Optional<AvaliacaoRisco> findFirstByIdRegiaoAndTipoRiscoOrderByDtAvaliacaoDesc(
+			Long idRegiao,
+			TipoRisco tipoRisco);
+
 }
