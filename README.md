@@ -34,6 +34,8 @@ Configure as seguintes variáveis antes de executar a aplicação:
 
 A aplicação usa Oracle e não cria nem atualiza o schema automaticamente. O DDL deve ser aplicado separadamente. A execução local da aplicação requer uma configuração Oracle válida.
 
+Nenhum dado inicial é incluído automaticamente. A API não executa carga de dados, seed ou inicialização por `CommandLineRunner`.
+
 ## Executar testes
 
 ```bash
@@ -134,6 +136,24 @@ O resumo do dashboard agrega os dados operacionais atuais persistidos no backend
 Filtros opcionais em `GET /api/indicadores-regionais`: `estado`, `cidade`, `tipoRisco` e `nivelRiscoMedio`.
 
 Os indicadores regionais são retornados a partir dos registros persistidos e podem ser preenchidos posteriormente por DML, PL/SQL ou pelo fluxo da aplicação.
+
+## Fluxo de demonstração
+
+Após aplicar o DDL e configurar as variáveis de ambiente do Oracle, use o Swagger UI em http://localhost:8080/swagger-ui/index.html para executar o fluxo:
+
+1. `POST /api/clientes`
+2. `POST /api/regioes`
+3. `POST /api/estacoes`
+4. `POST /api/leituras`
+5. `POST /api/observacoes-climaticas`
+6. `POST /api/riscos/avaliar/{idRegiao}`
+7. `GET /api/regioes/{id}/risco-atual`
+8. `GET /api/alertas`
+9. `PUT /api/alertas/{id}/resolver`
+10. `GET /api/dashboard/summary`
+11. `GET /api/indicadores-regionais`
+
+O endpoint de saúde está disponível em http://localhost:8080/api/health. As consultas por ID de clientes, regiões e estações incluem links HATEOAS mínimos para navegação entre recursos relacionados.
 
 ## Próximas fases
 

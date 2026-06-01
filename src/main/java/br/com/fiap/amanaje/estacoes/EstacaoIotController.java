@@ -11,6 +11,8 @@ import br.com.fiap.amanaje.estacoes.dto.EstacaoUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,8 +51,12 @@ public class EstacaoIotController {
 
 	@GetMapping("/{id}")
 	@Operation(summary = "Buscar estação IoT ativa por ID")
-	public EstacaoResponse buscarPorId(@PathVariable Long id) {
-		return estacaoService.buscarPorId(id);
+	public EntityModel<EstacaoResponse> buscarPorId(@PathVariable Long id) {
+		EstacaoResponse response = estacaoService.buscarPorId(id);
+		return EntityModel.of(
+				response,
+				linkTo(methodOn(EstacaoIotController.class).buscarPorId(id)).withSelfRel(),
+				Link.of("/api/leituras").withRel("leiturasPost"));
 	}
 
 	@PutMapping("/{id}")

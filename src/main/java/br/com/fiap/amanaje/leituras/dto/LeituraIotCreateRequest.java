@@ -8,10 +8,11 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 
 public record LeituraIotCreateRequest(
 		@Positive Long idEstacao,
-		@JsonAlias("stationCode") String codigoEstacao,
+		@JsonAlias("stationCode") @Size(max = 40) String codigoEstacao,
 		@JsonAlias("timestamp") LocalDateTime dtLeitura,
 		BigDecimal distanciaAguaCm,
 		@DecimalMin("0") @DecimalMax("100") BigDecimal nivelAguaPercentual,

@@ -9,10 +9,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 
 public record ObservacaoClimaticaCreateRequest(
 		@NotNull @Positive Long idRegiao,
-		@NotBlank String fonte,
+		@NotBlank @Size(max = 80) String fonte,
 		BigDecimal temperatura,
 		@DecimalMin("0") @DecimalMax("100") BigDecimal umidade,
 		@PositiveOrZero BigDecimal precipitacao,

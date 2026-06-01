@@ -6,9 +6,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import java.util.List;
 
 import br.com.fiap.amanaje.estacoes.EstacaoIotController;
+import br.com.fiap.amanaje.leituras.LeituraIotController;
 import br.com.fiap.amanaje.regioes.dto.RegiaoCreateRequest;
 import br.com.fiap.amanaje.regioes.dto.RegiaoResponse;
 import br.com.fiap.amanaje.regioes.dto.RegiaoUpdateRequest;
+import br.com.fiap.amanaje.riscos.RiscoController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -61,7 +63,9 @@ public class RegiaoMonitoradaController {
 		return EntityModel.of(
 				response,
 				linkTo(methodOn(RegiaoMonitoradaController.class).buscarPorId(id)).withSelfRel(),
-				linkTo(methodOn(EstacaoIotController.class).listarPorRegiao(id)).withRel("estacoes"));
+				linkTo(methodOn(EstacaoIotController.class).listarPorRegiao(id)).withRel("estacoes"),
+				linkTo(methodOn(LeituraIotController.class).listarPorRegiao(id)).withRel("leituras"),
+				linkTo(methodOn(RiscoController.class).buscarAtual(id)).withRel("riscoAtual"));
 	}
 
 	@PutMapping("/{id}")
