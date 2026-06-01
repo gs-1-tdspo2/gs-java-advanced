@@ -1,0 +1,20 @@
+package br.com.fiap.amanaje.estacoes.dto;
+
+import java.math.BigDecimal;
+
+import br.com.fiap.amanaje.estacoes.StatusEstacao;
+import br.com.fiap.amanaje.estacoes.TipoEstacao;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+public record EstacaoUpdateRequest(
+		@NotNull Long idRegiao,
+		@NotBlank String codigoEstacao,
+		@NotBlank String nome,
+		@NotNull TipoEstacao tipoEstacao,
+		@NotNull StatusEstacao statusEstacao,
+		@DecimalMin("-90") @DecimalMax("90") BigDecimal latitude,
+		@DecimalMin("-180") @DecimalMax("180") BigDecimal longitude) {
+}

@@ -6,9 +6,11 @@ import java.util.stream.Collectors;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -22,6 +24,34 @@ public class GlobalExceptionHandler {
 				.collect(Collectors.joining("; "));
 
 		return buildResponse(HttpStatus.BAD_REQUEST, message, request);
+	}
+
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public ResponseEntity<ApiErrorResponse> handleUnreadableMessage(
+			HttpMessageNotReadableException exception,
+			HttpServletRequest request) {
+		return buildResponse(HttpStatus.BAD_REQUEST, "Corpo da requisição inválido", request);
+	}
+
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<ApiErrorResponse> handleTypeMismatch(
+			MethodArgumentTypeMismatchException exception,
+			HttpServletRequest request) {
+		return buildResponse(HttpStatus.BAD_REQUEST, "Parâmetro inválido: " + exception.getName(), request);
+	}
+
+	@ExceptionHandler(ResourceNotFoundException.class)
+	public ResponseEntity<ApiErrorResponse> handleResourceNotFound(
+			ResourceNotFoundException exception,
+			HttpServletRequest request) {
+		return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage(), request);
+	}
+
+	@ExceptionHandler(BusinessRuleException.class)
+	public ResponseEntity<ApiErrorResponse> handleBusinessRule(
+			BusinessRuleException exception,
+			HttpServletRequest request) {
+		return buildResponse(HttpStatus.BAD_REQUEST, exception.getMessage(), request);
 	}
 
 	@ExceptionHandler(IllegalArgumentException.class)
