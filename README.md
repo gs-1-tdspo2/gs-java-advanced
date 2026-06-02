@@ -1,191 +1,876 @@
 # Amanajé API
 
-API principal do projeto Amanajé Global Solution 2026/1 para monitoramento climático e ambiental de áreas vulneráveis.
+API REST desenvolvida para a **Global Solution FIAP 2026/1**.
 
-## Tecnologias
+O **Amanajé** é uma solução de monitoramento climático e ambiental local voltada para áreas vulneráveis. A proposta é apoiar governos, Defesa Civil, ONGs e instituições na instalação, simulação e operação de estações IoT, combinando dados locais de sensores com observações climáticas externas para gerar avaliações de risco, alertas e indicadores regionais.
 
-- Java 17
-- Maven
-- Spring Boot 3
-- Spring Web
-- Spring Data JPA
-- Oracle Database
-- Bean Validation
-- Lombok
-- Spring HATEOAS
-- springdoc-openapi / Swagger UI
+---
 
-## Fase atual
+## Integrantes
 
-REST API demonstrável para clientes, regiões monitoradas, estações IoT, telemetria, observações climáticas, avaliação de risco, alertas, dashboard e indicadores regionais.
+| Integrante | Responsabilidades principais                                                     |
+| ---------- | -------------------------------------------------------------------------------- |
+| Gustavo    | Java Advanced; DevOps Tools & Cloud Computing                                    |
+| Lucca      | Mastering Relational and Non-Relational Database; Mobile Application Development |
+| Rafaela    | Compliance, Quality Assurance & Tests; TOGAF/ArchiMate                           |
+| Sabelli    | Advanced Business Development with .NET; IoT/Wokwi                               |
 
-As entidades JPA estão alinhadas ao DDL Oracle, que permanece como fonte de verdade do banco de dados. Os relacionamentos regionais são validados pela API com IDs simples nesta fase.
+---
 
-## Modelagem avançada Java
+## Objetivo do projeto
 
-Evidências de modelagem Java Advanced foram adicionadas sem alterar contratos HTTP, regras de negócio ou o DDL Oracle:
+O Amanajé busca resolver o problema da baixa cobertura de monitoramento climático e ambiental em regiões vulneráveis, rurais, periféricas, ribeirinhas ou sujeitas a desastres ambientais.
 
-- Herança: `EntidadeAuditavel` usa `@MappedSuperclass` para centralizar os campos operacionais compartilhados por `Cliente`, `Usuario`, `RegiaoMonitorada`, `EstacaoIot` e `Alerta`.
-- Embedded: `DadosRedeEstacao` usa `@Embeddable` e é incorporado em `LogStatusEstacao` para agrupar dados opcionais de rede.
-- Chaves compostas e consistência composta: o Oracle DDL aplica restrições compostas reais, como vínculos por `ID_REGIAO`; no Java, os relacionamentos seguem como IDs escalares para manter o MVP simples e confiável.
-- Múltiplas tabelas: o backend mapeia 13 entidades `TB_AMANAJE_*` com repositories Spring Data JPA.
+A aplicação propõe um núcleo funcional para organizar:
 
-Detalhes adicionais estão em `docs/modelagem-avancada-java.md`.
+* cadastro de clientes institucionais;
+* cadastro de usuários vinculados a clientes;
+* cadastro de regiões monitoradas;
+* cadastro de estações IoT reais, simuladas ou de referência;
+* recebimento de leituras IoT por HTTP;
+* persistência de observações climáticas externas produzidas pelo serviço .NET/C#;
+* cálculo de avaliações de risco ambiental;
+* geração e resolução de alertas;
+* consulta de indicadores regionais;
+* resumo operacional para dashboard.
 
-## Variáveis de ambiente
+No MVP, os tipos de cliente implementados são:
 
-Configure as seguintes variáveis antes de executar a aplicação:
+* Governo / Defesa Civil;
+* ONG.
 
-| Variável | Obrigatória | Descrição |
-| --- | --- | --- |
-| `SERVER_PORT` | Não | Porta HTTP. O valor padrão é `8080`. |
-| `DB_URL` | Recomendado | URL JDBC do banco Oracle. |
-| `DB_USERNAME` | Recomendado | Usuário do banco Oracle. |
-| `DB_PASSWORD` | Recomendado | Senha do banco Oracle. |
+Outros tipos de cliente, como fazenda privada, cooperativa e pesquisa/universidade, permanecem preparados no modelo, mas não dirigem complexidade funcional no backend desta versão.
 
-A aplicação usa somente Oracle e valida o schema existente sem criar ou atualizar tabelas automaticamente. O DDL deve ser aplicado separadamente antes da execução da API.
+---
 
-Para produção ou uso real, configure `DB_URL`, `DB_USERNAME` e `DB_PASSWORD` por variáveis de ambiente. O `application.yml` inclui valores fallback da conexão Oracle FIAP apenas para facilitar a execução escolar e demonstrativa.
+## Tecnologias utilizadas
 
-## Validação Oracle FIAP
+* Java 17
+* Spring Boot 3.5.14
+* Spring Web
+* Spring Data JPA
+* JpaRepository
+* Bean Validation / Spring Validation
+* Lombok
+* Spring Boot DevTools
+* Spring HATEOAS
+* Swagger/OpenAPI com Springdoc
+* Oracle Database
+* Maven
+* Docker e ambiente em nuvem serão tratados na etapa de DevOps
 
-A aplicação está configurada com `spring.jpa.hibernate.ddl-auto=validate` para validar o schema no Oracle FIAP. O DDL deve ser aplicado no schema configurado antes de iniciar a API. As variáveis de ambiente podem substituir a conexão padrão da sala de aula.
+---
 
-Se a inicialização falhar com erros de tabela ou coluna ausente, o DDL não foi aplicado corretamente ou algum mapeamento da entidade não corresponde ao banco de dados.
+## Estrutura do projeto
 
-Nenhum dado inicial é incluído automaticamente. A API não executa carga de dados, seed ou inicialização por `CommandLineRunner`.
-
-## Executar testes
-
-```bash
-./mvnw clean test
+```text
+src/main/java/br/com/fiap/amanaje
+├── alertas
+├── clientes
+├── common
+│   ├── auditoria
+│   ├── config
+│   ├── exception
+│   ├── log
+│   ├── model
+│   ├── processamento
+│   └── response
+├── dashboard
+├── estacoes
+├── indicadores
+├── leituras
+├── observacoes
+├── regioes
+├── riscos
+├── usuarios
+└── AmanajeApiApplication.java
 ```
 
-No Windows:
+---
+
+## Documentação da entrega
+
+Os principais documentos da entrega Java Advanced estão disponíveis na pasta `docs/`:
+
+| Documento                                                         | Descrição                                                                                                                           |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| [Arquitetura da Solução](docs/arquitetura.md)                     | Explica a arquitetura da API, camadas, módulos, integrações e fluxo macro da solução.                                               |
+| [Modelagem Avançada Java](docs/modelagem-avancada-java.md)        | Documenta a evidência de herança com `@MappedSuperclass`, uso de `@Embeddable`, múltiplas tabelas e decisão sobre chaves compostas. |
+| [DDL Oracle Amanajé](docs/database/AMANAJE_boot-setup_DDL_v3.sql) | Script DDL utilizado como fonte de verdade para o schema Oracle.                                                                    |
+
+---
+
+## Arquitetura macro
+
+O diagrama da arquitetura macro deve ser salvo em:
+
+```text
+docs/images/arquitetura-macro.png
+```
+
+Quando a imagem estiver disponível, ela pode ser exibida abaixo:
+
+<p align="center">
+  <img src="docs/images/arquitetura-macro.png" alt="Arquitetura macro Amanajé" width="900">
+</p>
+
+---
+
+## Camadas principais
+
+| Camada       | Função                                                                     |
+| ------------ | -------------------------------------------------------------------------- |
+| `controller` | Expõe os endpoints REST da API                                             |
+| `service`    | Contém regras de negócio, validações e orquestração                        |
+| `repository` | Faz a comunicação com o banco via Spring Data JPA                          |
+| `entity`     | Mapeia as tabelas Oracle com JPA                                           |
+| `dto`        | Records de entrada e saída das requisições                                 |
+| `exception`  | Tratamento centralizado de erros                                           |
+| `config`     | Configurações da aplicação, CORS e Swagger/OpenAPI                         |
+| `model`      | Evidências de modelagem avançada, como `@MappedSuperclass` e `@Embeddable` |
+
+---
+
+## Banco de dados Oracle
+
+A aplicação utiliza Oracle Database como banco relacional.
+
+O schema é criado a partir do DDL:
+
+```text
+docs/database/AMANAJE_boot-setup_DDL_v3.sql
+```
+
+A API utiliza:
+
+```yaml
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+```
+
+Isso significa que o Hibernate **valida** o schema existente, mas não cria, altera ou remove tabelas automaticamente.
+
+O DDL deve ser executado antes de iniciar a aplicação. Se alguma tabela ou coluna estiver ausente, a aplicação não inicializará corretamente.
+
+---
+
+## Configuração Oracle
+
+A configuração principal fica em:
+
+```text
+src/main/resources/application.yml
+```
+
+A aplicação está configurada para conectar ao Oracle FIAP usando valores padrão acadêmicos no próprio `application.yml`, mantendo também suporte a sobrescrita por variáveis de ambiente.
+
+Variáveis aceitas:
+
+```text
+SERVER_PORT
+DB_URL
+DB_USERNAME
+DB_PASSWORD
+```
+
+Exemplo em PowerShell, caso seja necessário sobrescrever a conexão:
+
+```powershell
+$env:DB_URL="jdbc:oracle:thin:@oracle.fiap.com.br:1521:ORCL"
+$env:DB_USERNAME="SEU_USUARIO"
+$env:DB_PASSWORD="SUA_SENHA"
+$env:SERVER_PORT="8080"
+.\mvnw.cmd spring-boot:run
+```
+
+---
+
+## Build do projeto
+
+Para compilar o projeto e executar os testes:
 
 ```powershell
 .\mvnw.cmd clean test
 ```
 
-## Executar localmente
+Também é possível gerar o pacote da aplicação:
 
-Após configurar o acesso ao Oracle:
-
-```bash
-./mvnw spring-boot:run
+```powershell
+.\mvnw.cmd clean package
 ```
 
-No Windows:
+---
+
+## Executando a aplicação
+
+Para iniciar a API:
 
 ```powershell
 .\mvnw.cmd spring-boot:run
 ```
 
-## Endpoints úteis
+Após iniciar a aplicação, acesse:
 
-- Swagger UI: http://localhost:8080/swagger-ui/index.html
-- Health check: http://localhost:8080/api/health
+```text
+http://localhost:8080/api/health
+```
 
-### Clientes
+Resposta esperada:
 
-- `POST /api/clientes`
-- `GET /api/clientes`
-- `GET /api/clientes/{id}`
-- `PUT /api/clientes/{id}`
-- `DELETE /api/clientes/{id}`
+```json
+{
+  "application": "Amanajé API",
+  "status": "UP",
+  "message": "API principal do Amanajé em execução"
+}
+```
 
-### Usuários
+---
 
-- `POST /api/usuarios`
-- `GET /api/usuarios`
-- `GET /api/usuarios/{id}`
-- `PUT /api/usuarios/{id}`
-- `DELETE /api/usuarios/{id}`
+## Swagger / OpenAPI
 
-Filtro opcional em `GET /api/usuarios`: `idCliente`.
+Com a aplicação em execução, a documentação Swagger pode ser acessada em:
 
-O CRUD de usuários é uma administração básica do MVP. Ele não implementa login, JWT ou autenticação. O campo `senhaHash` é aceito para compatibilidade de persistência, mas não é retornado nas respostas.
+```text
+http://localhost:8080/swagger-ui/index.html
+```
 
-### Regiões monitoradas
+A especificação OpenAPI em JSON pode ser acessada em:
 
-- `POST /api/regioes`
-- `GET /api/regioes`
-- `GET /api/regioes/{id}`
-- `PUT /api/regioes/{id}`
-- `DELETE /api/regioes/{id}`
+```text
+http://localhost:8080/v3/api-docs
+```
 
-Filtros opcionais em `GET /api/regioes`: `idCliente`, `estado`, `cidade` e `visibilidade`.
+---
 
-### Estações IoT
+## Principais módulos da API
 
-- `POST /api/estacoes`
-- `GET /api/estacoes/regiao/{idRegiao}`
-- `GET /api/estacoes/{id}`
-- `PUT /api/estacoes/{id}`
-- `DELETE /api/estacoes/{id}`
+### 1. Clientes
 
-### Leituras IoT
+```http
+/api/clientes
+```
 
-- `POST /api/leituras`
-- `GET /api/regioes/{id}/leituras`
+Permite cadastrar e consultar clientes institucionais do Amanajé.
 
-`POST /api/leituras` é o endpoint HTTP de contingência e entrada de telemetria para ESP32/Wokwi.
+Principais operações:
 
-### Observações climáticas
+```http
+POST   /api/clientes
+GET    /api/clientes
+GET    /api/clientes/{id}
+PUT    /api/clientes/{id}
+DELETE /api/clientes/{id}
+```
 
-- `POST /api/observacoes-climaticas`
-- `GET /api/regioes/{id}/observacoes-climaticas/ultima`
+O `DELETE` realiza exclusão lógica, marcando o registro como inativo.
 
-`POST /api/observacoes-climaticas` é o endpoint de integração esperado para o serviço climático em C#.
+---
 
-### Riscos
+### 2. Usuários
 
-- `POST /api/riscos/avaliar/{idRegiao}`
-- `GET /api/regioes/{id}/risco-atual`
+```http
+/api/usuarios
+```
 
-A avaliação de risco usa a leitura IoT válida mais recente e a observação climática mais recente disponíveis para a região.
+Permite cadastrar e consultar usuários vinculados a um cliente.
 
-### Alertas
+Principais operações:
 
-- `GET /api/alertas`
-- `PUT /api/alertas/{id}/resolver`
+```http
+POST   /api/usuarios
+GET    /api/usuarios
+GET    /api/usuarios/{id}
+PUT    /api/usuarios/{id}
+DELETE /api/usuarios/{id}
+```
 
-Filtros opcionais em `GET /api/alertas`: `idRegiao`, `status` e `nivel`.
+O endpoint `GET /api/usuarios` aceita filtro opcional por cliente:
 
-### Dashboard
+```http
+GET /api/usuarios?idCliente=1
+```
 
-- `GET /api/dashboard/summary`
+A API não implementa login, autenticação ou JWT nesta versão. O cadastro de usuários existe para representar o vínculo institucional previsto no MVP.
 
-Filtro opcional em `GET /api/dashboard/summary`: `idCliente`.
+---
 
-O resumo do dashboard agrega os dados operacionais atuais persistidos no backend.
+### 3. Regiões monitoradas
 
-### Indicadores regionais
+```http
+/api/regioes
+```
 
-- `GET /api/indicadores-regionais`
+Permite cadastrar regiões monitoradas vinculadas a clientes.
 
-Filtros opcionais em `GET /api/indicadores-regionais`: `estado`, `cidade`, `tipoRisco` e `nivelRiscoMedio`.
+Principais operações:
 
-Os indicadores regionais são retornados a partir dos registros persistidos e podem ser preenchidos posteriormente por DML, PL/SQL ou pelo fluxo da aplicação.
+```http
+POST   /api/regioes
+GET    /api/regioes
+GET    /api/regioes/{id}
+PUT    /api/regioes/{id}
+DELETE /api/regioes/{id}
+```
 
-## Fluxo de demonstração
+O endpoint de listagem aceita filtros como:
 
-Após aplicar o DDL e configurar as variáveis de ambiente do Oracle, use o Swagger UI em http://localhost:8080/swagger-ui/index.html para executar o fluxo:
+```http
+GET /api/regioes?idCliente=1
+GET /api/regioes?estado=SP
+GET /api/regioes?cidade=Ribeirão Preto
+```
 
-1. `POST /api/clientes`
-2. `POST /api/regioes`
-3. `POST /api/estacoes`
-4. `POST /api/leituras`
-5. `POST /api/observacoes-climaticas`
-6. `POST /api/riscos/avaliar/{idRegiao}`
-7. `GET /api/regioes/{id}/risco-atual`
-8. `GET /api/alertas`
-9. `PUT /api/alertas/{id}/resolver`
-10. `GET /api/dashboard/summary`
-11. `GET /api/indicadores-regionais`
+O `DELETE` realiza exclusão lógica.
 
-O endpoint de saúde está disponível em http://localhost:8080/api/health. As consultas por ID de clientes, regiões e estações incluem links HATEOAS mínimos para navegação entre recursos relacionados.
+---
 
-## Próximas fases
+### 4. Estações IoT
 
-Integrações adicionais serão implementadas nas próximas fases.
+```http
+/api/estacoes
+```
+
+Permite cadastrar estações IoT reais, simuladas ou de referência.
+
+Principais operações:
+
+```http
+POST   /api/estacoes
+GET    /api/estacoes/{id}
+PUT    /api/estacoes/{id}
+DELETE /api/estacoes/{id}
+GET    /api/estacoes/regiao/{idRegiao}
+```
+
+Uma região monitorada pode possuir várias estações IoT. Cada estação pertence a uma única região.
+
+---
+
+### 5. Leituras IoT
+
+```http
+/api/leituras
+```
+
+Endpoint utilizado para receber leituras de estações IoT, incluindo simulações feitas com ESP32/Wokwi.
+
+Principais operações:
+
+```http
+POST /api/leituras
+GET  /api/regioes/{id}/leituras
+```
+
+A leitura pode ser enviada identificando a estação por `idEstacao` ou por `codigoEstacao`.
+
+Exemplo de payload:
+
+```json
+{
+  "codigoEstacao": "AMANAJE-SP-RP-001",
+  "dtLeitura": "2026-06-02T14:30:00",
+  "distanciaAguaCm": 80,
+  "nivelAguaPercentual": 73,
+  "inclinacaoGraus": 18.5,
+  "vibracao": 0.72,
+  "pressaoHpa": 998.4,
+  "pm25": 118,
+  "pm10": 180
+}
+```
+
+---
+
+### 6. Observações climáticas externas
+
+```http
+/api/observacoes-climaticas
+```
+
+Endpoint utilizado como ponto de integração com o serviço .NET/C#, responsável por buscar dados climáticos externos e persistir observações normalizadas.
+
+Principais operações:
+
+```http
+POST /api/observacoes-climaticas
+GET  /api/regioes/{id}/observacoes-climaticas/ultima
+```
+
+Exemplo de payload:
+
+```json
+{
+  "idRegiao": 1,
+  "fonte": "Open-Meteo",
+  "temperatura": 28.5,
+  "umidade": 82,
+  "precipitacao": 12.4,
+  "vento": 18.2,
+  "pressaoHpa": 1004.8,
+  "radiacaoSolar": 520,
+  "indiceUv": 6.5,
+  "dtObservacao": "2026-06-02T14:30:00"
+}
+```
+
+---
+
+### 7. Avaliação de risco
+
+```http
+/api/riscos
+```
+
+A API calcula riscos ambientais a partir da última leitura IoT válida e da última observação climática externa da região.
+
+Principais operações:
+
+```http
+POST /api/riscos/avaliar/{idRegiao}
+GET  /api/regioes/{id}/risco-atual
+```
+
+Categorias de risco avaliadas:
+
+* `ENCHENTE`
+* `DESLIZAMENTO`
+* `TEMPESTADE`
+* `QUALIDADE_AR`
+
+Níveis de risco:
+
+| Nível      | Faixa de score |
+| ---------- | -------------- |
+| `BAIXO`    | 0 a 24         |
+| `MODERADO` | 25 a 49        |
+| `ALTO`     | 50 a 74        |
+| `CRITICO`  | 75 a 100       |
+
+Alertas são gerados automaticamente para riscos `ALTO` e `CRITICO`.
+
+---
+
+### 8. Alertas
+
+```http
+/api/alertas
+```
+
+Permite listar e resolver alertas gerados pelas avaliações de risco.
+
+Principais operações:
+
+```http
+GET /api/alertas
+PUT /api/alertas/{id}/resolver
+```
+
+Filtros opcionais:
+
+```http
+GET /api/alertas?idRegiao=1
+GET /api/alertas?status=ABERTO
+GET /api/alertas?nivel=CRITICO
+```
+
+A resolução de alerta altera o status para `RESOLVIDO` e registra data de resolução.
+
+---
+
+### 9. Dashboard
+
+```http
+/api/dashboard/summary
+```
+
+Fornece um resumo operacional para consumo do frontend.
+
+Principais operações:
+
+```http
+GET /api/dashboard/summary
+GET /api/dashboard/summary?idCliente=1
+```
+
+O resumo agrega informações como:
+
+* total de clientes ativos;
+* total de regiões ativas;
+* total de estações ativas;
+* total de alertas ativos;
+* total de alertas críticos;
+* total de leituras válidas;
+* total de observações climáticas;
+* maior nível de risco atual.
+
+---
+
+### 10. Indicadores regionais
+
+```http
+/api/indicadores-regionais
+```
+
+Lista indicadores regionais persistidos no banco.
+
+Principais operações:
+
+```http
+GET /api/indicadores-regionais
+```
+
+Filtros opcionais:
+
+```http
+GET /api/indicadores-regionais?estado=SP
+GET /api/indicadores-regionais?cidade=Ribeirão Preto
+GET /api/indicadores-regionais?tipoRisco=ENCHENTE
+GET /api/indicadores-regionais?nivelRiscoMedio=ALTO
+```
+
+Os indicadores podem ser populados por DML, PL/SQL, rotinas de banco ou fluxo de aplicação.
+
+---
+
+## Fluxo recomendado de teste
+
+Para validar o fluxo principal da API, recomenda-se executar as operações nesta ordem:
+
+1. Criar um cliente.
+2. Criar um usuário vinculado ao cliente.
+3. Criar uma região monitorada vinculada ao cliente.
+4. Criar uma estação IoT vinculada à região.
+5. Enviar uma leitura IoT para a estação.
+6. Registrar uma observação climática externa para a região.
+7. Executar a avaliação de risco da região.
+8. Consultar o risco atual da região.
+9. Consultar os alertas gerados.
+10. Resolver um alerta.
+11. Consultar o resumo do dashboard.
+12. Consultar indicadores regionais.
+
+---
+
+## Recursos técnicos implementados
+
+A API implementa os principais requisitos técnicos da disciplina de Java Advanced:
+
+* API REST com Spring Boot;
+* organização em camadas;
+* uso correto de controllers, services e repositories;
+* injeção de dependência com Spring;
+* entidades JPA mapeadas para Oracle;
+* 13 tabelas `TB_AMANAJE_*` mapeadas;
+* repositórios com Spring Data JPA e JpaRepository;
+* DTOs implementados com Java Records;
+* Bean Validation / Spring Validation;
+* tratamento centralizado de exceções;
+* respostas padronizadas de erro;
+* Swagger/OpenAPI;
+* CORS configurado;
+* Lombok;
+* Spring Boot DevTools;
+* HATEOAS em endpoints selecionados;
+* integração com Oracle FIAP;
+* validação do schema com `ddl-auto=validate`;
+* testes unitários de services e controller de health.
+
+---
+
+## Modelagem avançada Java
+
+A entrega inclui evidências de modelagem avançada sem comprometer a compatibilidade com o DDL Oracle.
+
+### Herança com `@MappedSuperclass`
+
+A classe de base auditável fica em:
+
+```text
+src/main/java/br/com/fiap/amanaje/common/model/EntidadeAuditavel.java
+```
+
+Ela centraliza campos operacionais comuns, como status ativo e campos de auditoria, quando aplicável.
+
+### Embedded com `@Embeddable`
+
+A modelagem embedded fica em:
+
+```text
+src/main/java/br/com/fiap/amanaje/common/model/PeriodoExecucao.java
+```
+
+Esse objeto representa um período de execução utilizado em processamento técnico.
+
+### Múltiplas tabelas
+
+A aplicação mapeia 13 tabelas relacionais do Oracle:
+
+```text
+TB_AMANAJE_CLI
+TB_AMANAJE_USU
+TB_AMANAJE_REGIAO_MONIT
+TB_AMANAJE_EST_IOT
+TB_AMANAJE_LEIT_IOT
+TB_AMANAJE_OBS_CLIM
+TB_AMANAJE_AVAL_RISCO
+TB_AMANAJE_ALERTA
+TB_AMANAJE_IND_REG
+TB_AMANAJE_HIST_EVENTO
+TB_AMANAJE_LOG_STATUS_EST
+TB_AMANAJE_PROCESS
+TB_AMANAJE_LOG_ERRO
+```
+
+### Chaves compostas e consistência regional
+
+O DDL Oracle utiliza constraints compostas e chaves estrangeiras compostas para reforçar a consistência entre regiões, estações, leituras, observações, avaliações e alertas.
+
+No Java, a decisão foi mapear os identificadores como campos escalares `Long`, evitando complexidade excessiva com relacionamentos compostos em JPA. A integridade estrutural permanece garantida pelo Oracle, enquanto a camada de serviço realiza validações de existência e regra de negócio.
+
+Essa decisão mantém a aplicação simples, demonstrável e compatível com o MVP acadêmico.
+
+---
+
+## HATEOAS
+
+A API utiliza HATEOAS de forma controlada em endpoints selecionados, sem transformar toda a aplicação em um modelo hipermídia complexo.
+
+Exemplos:
+
+```http
+GET /api/clientes/{id}
+GET /api/regioes/{id}
+GET /api/estacoes/{id}
+```
+
+Essas respostas incluem links como:
+
+* `self`;
+* regiões do cliente;
+* estações da região;
+* leituras da região;
+* risco atual da região;
+* endpoint de envio de leituras.
+
+---
+
+## Tratamento de erros
+
+A aplicação possui tratamento centralizado de exceções em:
+
+```text
+src/main/java/br/com/fiap/amanaje/common/exception/GlobalExceptionHandler.java
+```
+
+São tratadas respostas para:
+
+* erros de validação;
+* recurso não encontrado;
+* regra de negócio violada;
+* erro inesperado.
+
+As respostas seguem formato JSON padronizado, sem exposição de stack trace.
+
+---
+
+## Segurança
+
+A API não implementa autenticação, login, Spring Security ou JWT nesta versão.
+
+Essa decisão foi tomada para manter o escopo alinhado ao conteúdo efetivamente exigido para o MVP acadêmico e evitar complexidade adicional não necessária para a demonstração principal.
+
+O modelo de usuários permanece implementado para representar o vínculo institucional entre usuário e cliente.
+
+---
+
+## Evidências dos endpoints de clientes
+
+<details>
+  <summary><strong>POST /api/clientes</strong></summary>
+
+  <p align="center">
+    <img src="docs/images/clientes-post.png" alt="Evidência POST clientes" width="900">
+  </p>
+</details>
+
+<details>
+  <summary><strong>GET /api/clientes</strong></summary>
+
+  <p align="center">
+    <img src="docs/images/clientes-get.png" alt="Evidência GET clientes" width="900">
+  </p>
+</details>
+
+<details>
+  <summary><strong>PUT /api/clientes/{id}</strong></summary>
+
+  <p align="center">
+    <img src="docs/images/clientes-put.png" alt="Evidência PUT clientes" width="900">
+  </p>
+</details>
+
+<details>
+  <summary><strong>DELETE /api/clientes/{id}</strong></summary>
+
+  <p align="center">
+    <img src="docs/images/clientes-delete.png" alt="Evidência DELETE clientes" width="900">
+  </p>
+</details>
+
+---
+
+## Evidências dos endpoints de regiões
+
+<details>
+  <summary><strong>POST /api/regioes</strong></summary>
+
+  <p align="center">
+    <img src="docs/images/regioes-post.png" alt="Evidência POST regiões" width="900">
+  </p>
+</details>
+
+<details>
+  <summary><strong>GET /api/regioes</strong></summary>
+
+  <p align="center">
+    <img src="docs/images/regioes-get.png" alt="Evidência GET regiões" width="900">
+  </p>
+</details>
+
+<details>
+  <summary><strong>GET /api/regioes/{id}/risco-atual</strong></summary>
+
+  <p align="center">
+    <img src="docs/images/regioes-risco-atual-get.png" alt="Evidência GET risco atual da região" width="900">
+  </p>
+</details>
+
+---
+
+## Evidências dos endpoints de estações
+
+<details>
+  <summary><strong>POST /api/estacoes</strong></summary>
+
+  <p align="center">
+    <img src="docs/images/estacoes-post.png" alt="Evidência POST estações" width="900">
+  </p>
+</details>
+
+<details>
+  <summary><strong>GET /api/estacoes/regiao/{idRegiao}</strong></summary>
+
+  <p align="center">
+    <img src="docs/images/estacoes-regiao-get.png" alt="Evidência GET estações por região" width="900">
+  </p>
+</details>
+
+---
+
+## Evidências dos endpoints de leituras IoT
+
+<details>
+  <summary><strong>POST /api/leituras</strong></summary>
+
+  <p align="center">
+    <img src="docs/images/leituras-post.png" alt="Evidência POST leituras IoT" width="900">
+  </p>
+</details>
+
+<details>
+  <summary><strong>GET /api/regioes/{id}/leituras</strong></summary>
+
+  <p align="center">
+    <img src="docs/images/leituras-regiao-get.png" alt="Evidência GET leituras por região" width="900">
+  </p>
+</details>
+
+---
+
+## Evidências dos endpoints de riscos e alertas
+
+<details>
+  <summary><strong>POST /api/riscos/avaliar/{idRegiao}</strong></summary>
+
+  <p align="center">
+    <img src="docs/images/riscos-avaliar-post.png" alt="Evidência POST avaliação de risco" width="900">
+  </p>
+</details>
+
+<details>
+  <summary><strong>GET /api/alertas</strong></summary>
+
+  <p align="center">
+    <img src="docs/images/alertas-get.png" alt="Evidência GET alertas" width="900">
+  </p>
+</details>
+
+<details>
+  <summary><strong>PUT /api/alertas/{id}/resolver</strong></summary>
+
+  <p align="center">
+    <img src="docs/images/alertas-resolver-put.png" alt="Evidência PUT resolver alerta" width="900">
+  </p>
+</details>
+
+---
+
+## Evidências de dashboard e indicadores
+
+<details>
+  <summary><strong>GET /api/dashboard/summary</strong></summary>
+
+  <p align="center">
+    <img src="docs/images/dashboard-summary-get.png" alt="Evidência GET dashboard summary" width="900">
+  </p>
+</details>
+
+<details>
+  <summary><strong>GET /api/indicadores-regionais</strong></summary>
+
+  <p align="center">
+    <img src="docs/images/indicadores-regionais-get.png" alt="Evidência GET indicadores regionais" width="900">
+  </p>
+</details>
+
+---
+
+## Links da entrega
+
+Preencher antes da entrega final:
+
+| Item                                | Link                          |
+| ----------------------------------- | ----------------------------- |
+| Repositório GitHub                  | `INSERIR_LINK_DO_REPOSITORIO` |
+| Deploy público                      | `INSERIR_LINK_DO_DEPLOY`      |
+| Swagger/OpenAPI                     | `INSERIR_LINK_DO_SWAGGER`     |
+| Vídeo de apresentação Java Advanced | `INSERIR_LINK_DO_VIDEO`       |
+| Vídeo Pitch                         | `INSERIR_LINK_DO_PITCH`       |
+
+---
+
+## Status da entrega Java Advanced
+
+A API entrega um núcleo funcional do Amanajé, com:
+
+* cadastros de clientes, usuários, regiões e estações;
+* recebimento de telemetria IoT;
+* integração para observações climáticas externas;
+* cálculo de risco ambiental;
+* geração e resolução de alertas;
+* dashboard summary;
+* indicadores regionais;
+* persistência em Oracle;
+* validação real do schema Oracle com Hibernate;
+* Swagger/OpenAPI;
+* CORS;
+* HATEOAS em endpoints selecionados;
+* validações;
+* tratamento centralizado de erros;
+* README organizado;
+* estrutura preparada para integração com frontend, IoT, .NET, banco de dados e DevOps.
+
+---
