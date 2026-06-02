@@ -3,8 +3,8 @@ package br.com.fiap.amanaje.estacoes.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import br.com.fiap.amanaje.estacoes.StatusEstacao;
-import br.com.fiap.amanaje.estacoes.TipoEstacao;
+import br.com.fiap.amanaje.estacoes.enums.StatusEstacao;
+import br.com.fiap.amanaje.estacoes.enums.TipoEstacao;
 
 public record EstacaoResponse(
 		Long idEstacao,

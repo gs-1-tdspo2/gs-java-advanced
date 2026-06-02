@@ -1,5 +1,13 @@
 package br.com.fiap.amanaje.observacoes;
 
+import br.com.fiap.amanaje.observacoes.repository.ObservacaoClimaticaRepository;
+
+import br.com.fiap.amanaje.observacoes.service.ObservacaoClimaticaService;
+
+import br.com.fiap.amanaje.observacoes.model.ObservacaoClimatica;
+
+import br.com.fiap.amanaje.regioes.service.RegiaoMonitoradaService;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -11,8 +19,8 @@ import java.util.Optional;
 import br.com.fiap.amanaje.common.exception.ResourceNotFoundException;
 import br.com.fiap.amanaje.observacoes.dto.ObservacaoClimaticaCreateRequest;
 import br.com.fiap.amanaje.observacoes.dto.ObservacaoClimaticaResponse;
-import br.com.fiap.amanaje.regioes.RegiaoMonitorada;
-import br.com.fiap.amanaje.regioes.RegiaoMonitoradaService;
+import br.com.fiap.amanaje.regioes.model.RegiaoMonitorada;
+import br.com.fiap.amanaje.regioes.service.RegiaoMonitoradaService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

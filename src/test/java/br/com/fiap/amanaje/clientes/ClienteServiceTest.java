@@ -1,5 +1,11 @@
 package br.com.fiap.amanaje.clientes;
 
+import br.com.fiap.amanaje.clientes.repository.ClienteRepository;
+
+import br.com.fiap.amanaje.clientes.service.ClienteService;
+
+import br.com.fiap.amanaje.clientes.model.Cliente;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

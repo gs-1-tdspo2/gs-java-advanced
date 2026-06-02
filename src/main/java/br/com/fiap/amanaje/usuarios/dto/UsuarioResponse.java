@@ -2,8 +2,8 @@ package br.com.fiap.amanaje.usuarios.dto;
 
 import java.time.LocalDateTime;
 
-import br.com.fiap.amanaje.usuarios.PerfilUsuario;
-import br.com.fiap.amanaje.usuarios.StatusUsuario;
+import br.com.fiap.amanaje.usuarios.enums.PerfilUsuario;
+import br.com.fiap.amanaje.usuarios.enums.StatusUsuario;
 
 public record UsuarioResponse(
 		Long idUsuario,

@@ -1,5 +1,15 @@
 package br.com.fiap.amanaje.alertas;
 
+import br.com.fiap.amanaje.alertas.enums.TipoAlerta;
+
+import br.com.fiap.amanaje.alertas.enums.StatusAlerta;
+
+import br.com.fiap.amanaje.alertas.repository.AlertaRepository;
+
+import br.com.fiap.amanaje.alertas.service.AlertaService;
+
+import br.com.fiap.amanaje.alertas.model.Alerta;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -10,9 +20,9 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import br.com.fiap.amanaje.alertas.dto.AlertaResponse;
-import br.com.fiap.amanaje.riscos.AvaliacaoRisco;
-import br.com.fiap.amanaje.riscos.NivelRisco;
-import br.com.fiap.amanaje.riscos.TipoRisco;
+import br.com.fiap.amanaje.riscos.model.AvaliacaoRisco;
+import br.com.fiap.amanaje.riscos.enums.NivelRisco;
+import br.com.fiap.amanaje.riscos.enums.TipoRisco;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

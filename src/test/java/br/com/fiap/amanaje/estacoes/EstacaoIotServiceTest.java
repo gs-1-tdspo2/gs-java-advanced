@@ -1,5 +1,17 @@
 package br.com.fiap.amanaje.estacoes;
 
+import br.com.fiap.amanaje.estacoes.enums.TipoEstacao;
+
+import br.com.fiap.amanaje.estacoes.enums.StatusEstacao;
+
+import br.com.fiap.amanaje.estacoes.repository.EstacaoIotRepository;
+
+import br.com.fiap.amanaje.estacoes.service.EstacaoIotService;
+
+import br.com.fiap.amanaje.estacoes.model.EstacaoIot;
+
+import br.com.fiap.amanaje.regioes.service.RegiaoMonitoradaService;
+
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
@@ -7,8 +19,8 @@ import java.util.Optional;
 
 import br.com.fiap.amanaje.common.exception.BusinessRuleException;
 import br.com.fiap.amanaje.estacoes.dto.EstacaoCreateRequest;
-import br.com.fiap.amanaje.regioes.RegiaoMonitorada;
-import br.com.fiap.amanaje.regioes.RegiaoMonitoradaService;
+import br.com.fiap.amanaje.regioes.model.RegiaoMonitorada;
+import br.com.fiap.amanaje.regioes.service.RegiaoMonitoradaService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

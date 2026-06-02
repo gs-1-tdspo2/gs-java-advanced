@@ -66,7 +66,19 @@ Outros tipos de cliente, como fazenda privada, cooperativa e pesquisa/universida
 ```text
 src/main/java/br/com/fiap/amanaje
 ├── alertas
+│   ├── controller
+│   ├── dto
+│   ├── enums
+│   ├── model
+│   ├── repository
+│   └── service
 ├── clientes
+│   ├── controller
+│   ├── dto
+│   ├── enums
+│   ├── model
+│   ├── repository
+│   └── service
 ├── common
 │   ├── auditoria
 │   ├── config
@@ -76,42 +88,64 @@ src/main/java/br/com/fiap/amanaje
 │   ├── processamento
 │   └── response
 ├── dashboard
+│   ├── controller
+│   ├── dto
+│   └── service
 ├── estacoes
+│   ├── controller
+│   ├── dto
+│   ├── enums
+│   ├── model
+│   ├── repository
+│   └── service
 ├── indicadores
+│   ├── controller
+│   ├── dto
+│   ├── model
+│   ├── repository
+│   └── service
 ├── leituras
+│   ├── controller
+│   ├── dto
+│   ├── model
+│   ├── repository
+│   └── service
 ├── observacoes
+│   ├── controller
+│   ├── dto
+│   ├── model
+│   ├── repository
+│   └── service
 ├── regioes
+│   ├── controller
+│   ├── dto
+│   ├── enums
+│   ├── model
+│   ├── repository
+│   └── service
 ├── riscos
+│   ├── controller
+│   ├── dto
+│   ├── enums
+│   ├── model
+│   ├── repository
+│   └── service
 ├── usuarios
+│   ├── controller
+│   ├── dto
+│   ├── enums
+│   ├── model
+│   ├── repository
+│   └── service
 └── AmanajeApiApplication.java
 ```
 
 ---
 
-## Documentação da entrega
-
-Os principais documentos da entrega Java Advanced estão disponíveis na pasta `docs/`:
-
-| Documento                                                         | Descrição                                                                                                                           |
-| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| [Arquitetura da Solução](docs/arquitetura.md)                     | Explica a arquitetura da API, camadas, módulos, integrações e fluxo macro da solução.                                               |
-| [Modelagem Avançada Java](docs/modelagem-avancada-java.md)        | Documenta a evidência de herança com `@MappedSuperclass`, uso de `@Embeddable`, múltiplas tabelas e decisão sobre chaves compostas. |
-| [DDL Oracle Amanajé](docs/database/AMANAJE_boot-setup_DDL_v3.sql) | Script DDL utilizado como fonte de verdade para o schema Oracle.                                                                    |
-
----
-
-## Arquitetura macro
-
-O diagrama da arquitetura macro deve ser salvo em:
-
-```text
-docs/images/arquitetura-macro.png
-```
-
-Quando a imagem estiver disponível, ela pode ser exibida abaixo:
+## Arquitetura
 
 <p align="center">
-  <img src="docs/images/arquitetura-macro.png" alt="Arquitetura macro Amanajé" width="900">
+  <img src="docs/images/amanaje-diagram.png" alt="Arquitetura macro Amanajé" width="900">
 </p>
 
 ---
@@ -123,11 +157,11 @@ Quando a imagem estiver disponível, ela pode ser exibida abaixo:
 | `controller` | Expõe os endpoints REST da API                                             |
 | `service`    | Contém regras de negócio, validações e orquestração                        |
 | `repository` | Faz a comunicação com o banco via Spring Data JPA                          |
-| `entity`     | Mapeia as tabelas Oracle com JPA                                           |
+| `model`      | Mapeia as tabelas Oracle com JPA e agrupa modelos compartilhados           |
 | `dto`        | Records de entrada e saída das requisições                                 |
+| `enums`      | Enumerações de domínio                                                     |
 | `exception`  | Tratamento centralizado de erros                                           |
 | `config`     | Configurações da aplicação, CORS e Swagger/OpenAPI                         |
-| `model`      | Evidências de modelagem avançada, como `@MappedSuperclass` e `@Embeddable` |
 
 ---
 
@@ -150,23 +184,20 @@ spring:
       ddl-auto: validate
 ```
 
-Isso significa que o Hibernate **valida** o schema existente, mas não cria, altera ou remove tabelas automaticamente.
+O Hibernate valida o schema existente, mas não cria, altera ou remove tabelas automaticamente.
 
-O DDL deve ser executado antes de iniciar a aplicação. Se alguma tabela ou coluna estiver ausente, a aplicação não inicializará corretamente.
 
 ---
 
 ## Configuração Oracle
 
-A configuração principal fica em:
+A configuração fica em:
 
 ```text
 src/main/resources/application.yml
 ```
 
 A aplicação está configurada para conectar ao Oracle FIAP usando valores padrão acadêmicos no próprio `application.yml`, mantendo também suporte a sobrescrita por variáveis de ambiente.
-
-Variáveis aceitas:
 
 ```text
 SERVER_PORT
@@ -535,7 +566,7 @@ Os indicadores podem ser populados por DML, PL/SQL, rotinas de banco ou fluxo de
 
 ---
 
-## Fluxo recomendado de teste
+## Fluxo de teste
 
 Para validar o fluxo principal da API, recomenda-se executar as operações nesta ordem:
 
@@ -554,9 +585,9 @@ Para validar o fluxo principal da API, recomenda-se executar as operações nest
 
 ---
 
-## Recursos técnicos implementados
+## Recursos técnicos
 
-A API implementa os principais requisitos técnicos da disciplina de Java Advanced:
+A API implementa os principais requisitos técnicos:
 
 * API REST com Spring Boot;
 * organização em camadas;
@@ -580,297 +611,14 @@ A API implementa os principais requisitos técnicos da disciplina de Java Advanc
 
 ---
 
-## Modelagem avançada Java
-
-A entrega inclui evidências de modelagem avançada sem comprometer a compatibilidade com o DDL Oracle.
-
-### Herança com `@MappedSuperclass`
-
-A classe de base auditável fica em:
-
-```text
-src/main/java/br/com/fiap/amanaje/common/model/EntidadeAuditavel.java
-```
-
-Ela centraliza campos operacionais comuns, como status ativo e campos de auditoria, quando aplicável.
-
-### Embedded com `@Embeddable`
-
-A modelagem embedded fica em:
-
-```text
-src/main/java/br/com/fiap/amanaje/common/model/PeriodoExecucao.java
-```
-
-Esse objeto representa um período de execução utilizado em processamento técnico.
-
-### Múltiplas tabelas
-
-A aplicação mapeia 13 tabelas relacionais do Oracle:
-
-```text
-TB_AMANAJE_CLI
-TB_AMANAJE_USU
-TB_AMANAJE_REGIAO_MONIT
-TB_AMANAJE_EST_IOT
-TB_AMANAJE_LEIT_IOT
-TB_AMANAJE_OBS_CLIM
-TB_AMANAJE_AVAL_RISCO
-TB_AMANAJE_ALERTA
-TB_AMANAJE_IND_REG
-TB_AMANAJE_HIST_EVENTO
-TB_AMANAJE_LOG_STATUS_EST
-TB_AMANAJE_PROCESS
-TB_AMANAJE_LOG_ERRO
-```
-
-### Chaves compostas e consistência regional
-
-O DDL Oracle utiliza constraints compostas e chaves estrangeiras compostas para reforçar a consistência entre regiões, estações, leituras, observações, avaliações e alertas.
-
-No Java, a decisão foi mapear os identificadores como campos escalares `Long`, evitando complexidade excessiva com relacionamentos compostos em JPA. A integridade estrutural permanece garantida pelo Oracle, enquanto a camada de serviço realiza validações de existência e regra de negócio.
-
-Essa decisão mantém a aplicação simples, demonstrável e compatível com o MVP acadêmico.
-
----
-
-## HATEOAS
-
-A API utiliza HATEOAS de forma controlada em endpoints selecionados, sem transformar toda a aplicação em um modelo hipermídia complexo.
-
-Exemplos:
-
-```http
-GET /api/clientes/{id}
-GET /api/regioes/{id}
-GET /api/estacoes/{id}
-```
-
-Essas respostas incluem links como:
-
-* `self`;
-* regiões do cliente;
-* estações da região;
-* leituras da região;
-* risco atual da região;
-* endpoint de envio de leituras.
-
----
-
-## Tratamento de erros
-
-A aplicação possui tratamento centralizado de exceções em:
-
-```text
-src/main/java/br/com/fiap/amanaje/common/exception/GlobalExceptionHandler.java
-```
-
-São tratadas respostas para:
-
-* erros de validação;
-* recurso não encontrado;
-* regra de negócio violada;
-* erro inesperado.
-
-As respostas seguem formato JSON padronizado, sem exposição de stack trace.
-
----
-
-## Segurança
-
-A API não implementa autenticação, login, Spring Security ou JWT nesta versão.
-
-Essa decisão foi tomada para manter o escopo alinhado ao conteúdo efetivamente exigido para o MVP acadêmico e evitar complexidade adicional não necessária para a demonstração principal.
-
-O modelo de usuários permanece implementado para representar o vínculo institucional entre usuário e cliente.
-
----
-
-## Evidências dos endpoints de clientes
-
-<details>
-  <summary><strong>POST /api/clientes</strong></summary>
-
-  <p align="center">
-    <img src="docs/images/clientes-post.png" alt="Evidência POST clientes" width="900">
-  </p>
-</details>
-
-<details>
-  <summary><strong>GET /api/clientes</strong></summary>
-
-  <p align="center">
-    <img src="docs/images/clientes-get.png" alt="Evidência GET clientes" width="900">
-  </p>
-</details>
-
-<details>
-  <summary><strong>PUT /api/clientes/{id}</strong></summary>
-
-  <p align="center">
-    <img src="docs/images/clientes-put.png" alt="Evidência PUT clientes" width="900">
-  </p>
-</details>
-
-<details>
-  <summary><strong>DELETE /api/clientes/{id}</strong></summary>
-
-  <p align="center">
-    <img src="docs/images/clientes-delete.png" alt="Evidência DELETE clientes" width="900">
-  </p>
-</details>
-
----
-
-## Evidências dos endpoints de regiões
-
-<details>
-  <summary><strong>POST /api/regioes</strong></summary>
-
-  <p align="center">
-    <img src="docs/images/regioes-post.png" alt="Evidência POST regiões" width="900">
-  </p>
-</details>
-
-<details>
-  <summary><strong>GET /api/regioes</strong></summary>
-
-  <p align="center">
-    <img src="docs/images/regioes-get.png" alt="Evidência GET regiões" width="900">
-  </p>
-</details>
-
-<details>
-  <summary><strong>GET /api/regioes/{id}/risco-atual</strong></summary>
-
-  <p align="center">
-    <img src="docs/images/regioes-risco-atual-get.png" alt="Evidência GET risco atual da região" width="900">
-  </p>
-</details>
-
----
-
-## Evidências dos endpoints de estações
-
-<details>
-  <summary><strong>POST /api/estacoes</strong></summary>
-
-  <p align="center">
-    <img src="docs/images/estacoes-post.png" alt="Evidência POST estações" width="900">
-  </p>
-</details>
-
-<details>
-  <summary><strong>GET /api/estacoes/regiao/{idRegiao}</strong></summary>
-
-  <p align="center">
-    <img src="docs/images/estacoes-regiao-get.png" alt="Evidência GET estações por região" width="900">
-  </p>
-</details>
-
----
-
-## Evidências dos endpoints de leituras IoT
-
-<details>
-  <summary><strong>POST /api/leituras</strong></summary>
-
-  <p align="center">
-    <img src="docs/images/leituras-post.png" alt="Evidência POST leituras IoT" width="900">
-  </p>
-</details>
-
-<details>
-  <summary><strong>GET /api/regioes/{id}/leituras</strong></summary>
-
-  <p align="center">
-    <img src="docs/images/leituras-regiao-get.png" alt="Evidência GET leituras por região" width="900">
-  </p>
-</details>
-
----
-
-## Evidências dos endpoints de riscos e alertas
-
-<details>
-  <summary><strong>POST /api/riscos/avaliar/{idRegiao}</strong></summary>
-
-  <p align="center">
-    <img src="docs/images/riscos-avaliar-post.png" alt="Evidência POST avaliação de risco" width="900">
-  </p>
-</details>
-
-<details>
-  <summary><strong>GET /api/alertas</strong></summary>
-
-  <p align="center">
-    <img src="docs/images/alertas-get.png" alt="Evidência GET alertas" width="900">
-  </p>
-</details>
-
-<details>
-  <summary><strong>PUT /api/alertas/{id}/resolver</strong></summary>
-
-  <p align="center">
-    <img src="docs/images/alertas-resolver-put.png" alt="Evidência PUT resolver alerta" width="900">
-  </p>
-</details>
-
----
-
-## Evidências de dashboard e indicadores
-
-<details>
-  <summary><strong>GET /api/dashboard/summary</strong></summary>
-
-  <p align="center">
-    <img src="docs/images/dashboard-summary-get.png" alt="Evidência GET dashboard summary" width="900">
-  </p>
-</details>
-
-<details>
-  <summary><strong>GET /api/indicadores-regionais</strong></summary>
-
-  <p align="center">
-    <img src="docs/images/indicadores-regionais-get.png" alt="Evidência GET indicadores regionais" width="900">
-  </p>
-</details>
-
----
-
 ## Links da entrega
 
-Preencher antes da entrega final:
-
-| Item                                | Link                          |
-| ----------------------------------- | ----------------------------- |
-| Repositório GitHub                  | `INSERIR_LINK_DO_REPOSITORIO` |
-| Deploy público                      | `INSERIR_LINK_DO_DEPLOY`      |
-| Swagger/OpenAPI                     | `INSERIR_LINK_DO_SWAGGER`     |
-| Vídeo de apresentação Java Advanced | `INSERIR_LINK_DO_VIDEO`       |
-| Vídeo Pitch                         | `INSERIR_LINK_DO_PITCH`       |
-
----
-
-## Status da entrega Java Advanced
-
-A API entrega um núcleo funcional do Amanajé, com:
-
-* cadastros de clientes, usuários, regiões e estações;
-* recebimento de telemetria IoT;
-* integração para observações climáticas externas;
-* cálculo de risco ambiental;
-* geração e resolução de alertas;
-* dashboard summary;
-* indicadores regionais;
-* persistência em Oracle;
-* validação real do schema Oracle com Hibernate;
-* Swagger/OpenAPI;
-* CORS;
-* HATEOAS em endpoints selecionados;
-* validações;
-* tratamento centralizado de erros;
-* README organizado;
-* estrutura preparada para integração com frontend, IoT, .NET, banco de dados e DevOps.
+| Item                                | Link                        |
+| ----------------------------------- | --------------------------- |
+| Repositório GitHub                  | https://github.com/gs-1-tdspo2/gs-java-advanced |
+| Deploy público                      | `INSERIR_LINK_DO_DEPLOY`    |
+| Swagger/OpenAPI                     | `INSERIR_LINK_DO_SWAGGER`   |
+| Vídeo de apresentação Java Advanced | `INSERIR_LINK_DO_VIDEO`     |
+| Vídeo Pitch                         | `INSERIR_LINK_DO_PITCH`     |
 
 ---

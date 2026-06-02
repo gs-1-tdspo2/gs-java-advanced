@@ -1,5 +1,17 @@
 package br.com.fiap.amanaje.usuarios;
 
+import br.com.fiap.amanaje.usuarios.enums.StatusUsuario;
+
+import br.com.fiap.amanaje.usuarios.enums.PerfilUsuario;
+
+import br.com.fiap.amanaje.usuarios.repository.UsuarioRepository;
+
+import br.com.fiap.amanaje.usuarios.service.UsuarioService;
+
+import br.com.fiap.amanaje.usuarios.model.Usuario;
+
+import br.com.fiap.amanaje.clientes.service.ClienteService;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -9,8 +21,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
-import br.com.fiap.amanaje.clientes.Cliente;
-import br.com.fiap.amanaje.clientes.ClienteService;
+import br.com.fiap.amanaje.clientes.model.Cliente;
+import br.com.fiap.amanaje.clientes.service.ClienteService;
 import br.com.fiap.amanaje.common.exception.BusinessRuleException;
 import br.com.fiap.amanaje.usuarios.dto.UsuarioCreateRequest;
 import br.com.fiap.amanaje.usuarios.dto.UsuarioResponse;

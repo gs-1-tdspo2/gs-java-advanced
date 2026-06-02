@@ -1,5 +1,11 @@
 package br.com.fiap.amanaje.indicadores;
 
+import br.com.fiap.amanaje.indicadores.repository.IndicadorRegionalRepository;
+
+import br.com.fiap.amanaje.indicadores.service.IndicadorRegionalService;
+
+import br.com.fiap.amanaje.indicadores.model.IndicadorRegional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -7,8 +13,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import br.com.fiap.amanaje.indicadores.dto.IndicadorRegionalResponse;
-import br.com.fiap.amanaje.riscos.NivelRisco;
-import br.com.fiap.amanaje.riscos.TipoRisco;
+import br.com.fiap.amanaje.riscos.enums.NivelRisco;
+import br.com.fiap.amanaje.riscos.enums.TipoRisco;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

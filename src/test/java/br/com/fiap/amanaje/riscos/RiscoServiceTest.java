@@ -1,4 +1,22 @@
-package br.com.fiap.amanaje.riscos;
+package br.com.fiap.amanaje.riscos.service;
+
+import br.com.fiap.amanaje.alertas.service.AlertaService;
+
+import br.com.fiap.amanaje.riscos.enums.TipoRisco;
+
+import br.com.fiap.amanaje.riscos.enums.NivelRisco;
+
+import br.com.fiap.amanaje.riscos.repository.AvaliacaoRiscoRepository;
+
+import br.com.fiap.amanaje.riscos.service.RiscoService;
+
+import br.com.fiap.amanaje.riscos.model.AvaliacaoRisco;
+
+import br.com.fiap.amanaje.observacoes.repository.ObservacaoClimaticaRepository;
+
+import br.com.fiap.amanaje.leituras.repository.LeituraIotRepository;
+
+import br.com.fiap.amanaje.regioes.service.RegiaoMonitoradaService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -10,14 +28,14 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import br.com.fiap.amanaje.alertas.AlertaService;
+import br.com.fiap.amanaje.alertas.service.AlertaService;
 import br.com.fiap.amanaje.common.exception.BusinessRuleException;
-import br.com.fiap.amanaje.leituras.LeituraIot;
-import br.com.fiap.amanaje.leituras.LeituraIotRepository;
-import br.com.fiap.amanaje.observacoes.ObservacaoClimatica;
-import br.com.fiap.amanaje.observacoes.ObservacaoClimaticaRepository;
-import br.com.fiap.amanaje.regioes.RegiaoMonitorada;
-import br.com.fiap.amanaje.regioes.RegiaoMonitoradaService;
+import br.com.fiap.amanaje.leituras.model.LeituraIot;
+import br.com.fiap.amanaje.leituras.repository.LeituraIotRepository;
+import br.com.fiap.amanaje.observacoes.model.ObservacaoClimatica;
+import br.com.fiap.amanaje.observacoes.repository.ObservacaoClimaticaRepository;
+import br.com.fiap.amanaje.regioes.model.RegiaoMonitorada;
+import br.com.fiap.amanaje.regioes.service.RegiaoMonitoradaService;
 import br.com.fiap.amanaje.riscos.dto.AvaliarRiscoResponse;
 import br.com.fiap.amanaje.riscos.dto.RiscoAtualResponse;
 import org.junit.jupiter.api.Test;

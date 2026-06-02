@@ -1,5 +1,17 @@
 package br.com.fiap.amanaje.leituras;
 
+import br.com.fiap.amanaje.leituras.repository.LeituraIotRepository;
+
+import br.com.fiap.amanaje.leituras.service.LeituraIotService;
+
+import br.com.fiap.amanaje.leituras.model.LeituraIot;
+
+import br.com.fiap.amanaje.estacoes.repository.EstacaoIotRepository;
+
+import br.com.fiap.amanaje.estacoes.service.EstacaoIotService;
+
+import br.com.fiap.amanaje.regioes.service.RegiaoMonitoradaService;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -9,12 +21,12 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 
 import br.com.fiap.amanaje.common.exception.BusinessRuleException;
-import br.com.fiap.amanaje.estacoes.EstacaoIot;
-import br.com.fiap.amanaje.estacoes.EstacaoIotRepository;
-import br.com.fiap.amanaje.estacoes.EstacaoIotService;
+import br.com.fiap.amanaje.estacoes.model.EstacaoIot;
+import br.com.fiap.amanaje.estacoes.repository.EstacaoIotRepository;
+import br.com.fiap.amanaje.estacoes.service.EstacaoIotService;
 import br.com.fiap.amanaje.leituras.dto.LeituraIotCreateRequest;
 import br.com.fiap.amanaje.leituras.dto.LeituraIotResponse;
-import br.com.fiap.amanaje.regioes.RegiaoMonitoradaService;
+import br.com.fiap.amanaje.regioes.service.RegiaoMonitoradaService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

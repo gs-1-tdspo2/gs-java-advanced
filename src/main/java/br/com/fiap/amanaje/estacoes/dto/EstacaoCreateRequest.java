@@ -2,8 +2,8 @@ package br.com.fiap.amanaje.estacoes.dto;
 
 import java.math.BigDecimal;
 
-import br.com.fiap.amanaje.estacoes.StatusEstacao;
-import br.com.fiap.amanaje.estacoes.TipoEstacao;
+import br.com.fiap.amanaje.estacoes.enums.StatusEstacao;
+import br.com.fiap.amanaje.estacoes.enums.TipoEstacao;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;

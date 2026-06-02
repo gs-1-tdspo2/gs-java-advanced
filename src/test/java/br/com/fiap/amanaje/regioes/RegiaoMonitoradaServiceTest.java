@@ -1,11 +1,23 @@
 package br.com.fiap.amanaje.regioes;
 
+import br.com.fiap.amanaje.regioes.enums.TipoVisibilidade;
+
+import br.com.fiap.amanaje.regioes.enums.TipoArea;
+
+import br.com.fiap.amanaje.regioes.repository.RegiaoMonitoradaRepository;
+
+import br.com.fiap.amanaje.regioes.service.RegiaoMonitoradaService;
+
+import br.com.fiap.amanaje.clientes.service.ClienteService;
+
+import br.com.fiap.amanaje.clientes.model.Cliente;
+
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 
-import br.com.fiap.amanaje.clientes.ClienteService;
+import br.com.fiap.amanaje.clientes.service.ClienteService;
 import br.com.fiap.amanaje.common.exception.ResourceNotFoundException;
 import br.com.fiap.amanaje.regioes.dto.RegiaoCreateRequest;
 import org.junit.jupiter.api.Test;
