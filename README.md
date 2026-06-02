@@ -21,6 +21,17 @@ REST API demonstrável para clientes, regiões monitoradas, estações IoT, tele
 
 As entidades JPA estão alinhadas ao DDL Oracle, que permanece como fonte de verdade do banco de dados. Os relacionamentos regionais são validados pela API com IDs simples nesta fase.
 
+## Modelagem avançada Java
+
+Evidências de modelagem Java Advanced foram adicionadas sem alterar contratos HTTP, regras de negócio ou o DDL Oracle:
+
+- Herança: `EntidadeAuditavel` usa `@MappedSuperclass` para centralizar os campos operacionais compartilhados por `Cliente`, `Usuario`, `RegiaoMonitorada`, `EstacaoIot` e `Alerta`.
+- Embedded: `DadosRedeEstacao` usa `@Embeddable` e é incorporado em `LogStatusEstacao` para agrupar dados opcionais de rede.
+- Chaves compostas e consistência composta: o Oracle DDL aplica restrições compostas reais, como vínculos por `ID_REGIAO`; no Java, os relacionamentos seguem como IDs escalares para manter o MVP simples e confiável.
+- Múltiplas tabelas: o backend mapeia 13 entidades `TB_AMANAJE_*` com repositories Spring Data JPA.
+
+Detalhes adicionais estão em `docs/modelagem-avancada-java.md`.
+
 ## Variáveis de ambiente
 
 Configure as seguintes variáveis antes de executar a aplicação:

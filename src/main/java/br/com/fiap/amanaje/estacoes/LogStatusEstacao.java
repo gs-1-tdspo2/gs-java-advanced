@@ -3,7 +3,11 @@ package br.com.fiap.amanaje.estacoes;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import br.com.fiap.amanaje.common.model.DadosRedeEstacao;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -38,11 +42,12 @@ public class LogStatusEstacao {
 	@Column(name = "NR_RSSI")
 	private BigDecimal rssi;
 
-	@Column(name = "DS_IP_ADDRESS")
-	private String ipAddress;
-
-	@Column(name = "DS_VERSAO_FIRMWARE")
-	private String versaoFirmware;
+	@Embedded
+	@AttributeOverrides({
+			@AttributeOverride(name = "ipAddress", column = @Column(name = "DS_IP_ADDRESS")),
+			@AttributeOverride(name = "versaoFirmware", column = @Column(name = "DS_VERSAO_FIRMWARE"))
+	})
+	private DadosRedeEstacao dadosRede;
 
 	@Column(name = "DT_REGISTRO")
 	private LocalDateTime dtRegistro;
