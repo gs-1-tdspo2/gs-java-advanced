@@ -36,7 +36,7 @@ public class IndicadorRegional {
 	@Column(name = "ID_REGIAO")
 	private Long idRegiao;
 
-	@Column(name = "SG_ESTADO")
+	@Column(name = "SG_ESTADO", length = 2, columnDefinition = "CHAR(2)")
 	private String estado;
 
 	@Column(name = "NM_CIDADE")

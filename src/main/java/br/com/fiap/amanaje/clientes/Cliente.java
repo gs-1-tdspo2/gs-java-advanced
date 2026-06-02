@@ -46,7 +46,7 @@ public class Cliente {
 	@Column(name = "NR_TELEFONE")
 	private String telefone;
 
-	@Column(name = "ST_ATIVO")
+	@Column(name = "ST_ATIVO", length = 1, columnDefinition = "CHAR(1)")
 	private String stAtivo;
 
 	@Column(name = "DT_CRIADO_EM")

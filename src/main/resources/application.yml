@@ -5,12 +5,15 @@ spring:
   application:
     name: amanaje-api
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${DB_URL:jdbc:oracle:thin:@oracle.fiap.com.br:1521:ORCL}
+    username: ${DB_USERNAME:RM561996}
+    password: ${DB_PASSWORD:230602}
     driver-class-name: oracle.jdbc.OracleDriver
   jpa:
     hibernate:
-      ddl-auto: none
-    database-platform: org.hibernate.dialect.OracleDialect
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
     open-in-view: false

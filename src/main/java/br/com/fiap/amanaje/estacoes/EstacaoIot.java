@@ -57,7 +57,7 @@ public class EstacaoIot {
 	@Column(name = "DT_ULTIMA_COM")
 	private LocalDateTime dtUltimaComunicacao;
 
-	@Column(name = "ST_ATIVO")
+	@Column(name = "ST_ATIVO", length = 1, columnDefinition = "CHAR(1)")
 	private String stAtivo;
 
 	@Column(name = "DT_CRIADO_EM")

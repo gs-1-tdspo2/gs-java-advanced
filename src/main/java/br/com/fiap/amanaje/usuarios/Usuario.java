@@ -50,7 +50,7 @@ public class Usuario {
 	@Column(name = "ST_USU")
 	private StatusUsuario statusUsuario;
 
-	@Column(name = "ST_ATIVO")
+	@Column(name = "ST_ATIVO", length = 1, columnDefinition = "CHAR(1)")
 	private String stAtivo;
 
 	@Column(name = "DT_CRIADO_EM")
