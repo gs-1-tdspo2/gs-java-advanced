@@ -142,30 +142,10 @@ src/main/java/br/com/fiap/amanaje
 
 ---
 
-## Documentação da entrega
-
-Os principais documentos da entrega Java Advanced estão disponíveis na pasta `docs/`:
-
-| Documento                                                         | Descrição                                                                                                                           |
-| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| [Arquitetura da Solução](docs/arquitetura.md)                     | Explica a arquitetura da API, camadas, módulos, integrações e fluxo macro da solução.                                               |
-| [Modelagem Avançada Java](docs/modelagem-avancada-java.md)        | Documenta a evidência de herança com `@MappedSuperclass`, uso de `@Embeddable`, múltiplas tabelas e decisão sobre chaves compostas. |
-| [DDL Oracle Amanajé](docs/database/AMANAJE_boot-setup_DDL_v3.sql) | Script DDL utilizado como fonte de verdade para o schema Oracle.                                                                    |
-
----
-
-## Arquitetura macro
-
-O diagrama da arquitetura macro deve ser salvo em:
-
-```text
-docs/images/arquitetura-macro.png
-```
-
-Quando a imagem estiver disponível, ela pode ser exibida abaixo:
+## Arquitetura
 
 <p align="center">
-  <img src="docs/images/arquitetura-macro.png" alt="Arquitetura macro Amanajé" width="900">
+  <img src="docs/images/amanaje-diagram.png" alt="Arquitetura macro Amanajé" width="900">
 </p>
 
 ---
@@ -204,23 +184,20 @@ spring:
       ddl-auto: validate
 ```
 
-Isso significa que o Hibernate **valida** o schema existente, mas não cria, altera ou remove tabelas automaticamente.
+O Hibernate valida o schema existente, mas não cria, altera ou remove tabelas automaticamente.
 
-O DDL deve ser executado antes de iniciar a aplicação. Se alguma tabela ou coluna estiver ausente, a aplicação não inicializará corretamente.
 
 ---
 
 ## Configuração Oracle
 
-A configuração principal fica em:
+A configuração fica em:
 
 ```text
 src/main/resources/application.yml
 ```
 
 A aplicação está configurada para conectar ao Oracle FIAP usando valores padrão acadêmicos no próprio `application.yml`, mantendo também suporte a sobrescrita por variáveis de ambiente.
-
-Variáveis aceitas:
 
 ```text
 SERVER_PORT
@@ -589,7 +566,7 @@ Os indicadores podem ser populados por DML, PL/SQL, rotinas de banco ou fluxo de
 
 ---
 
-## Fluxo recomendado de teste
+## Fluxo de teste
 
 Para validar o fluxo principal da API, recomenda-se executar as operações nesta ordem:
 
@@ -608,9 +585,9 @@ Para validar o fluxo principal da API, recomenda-se executar as operações nest
 
 ---
 
-## Recursos técnicos implementados
+## Recursos técnicos
 
-A API implementa os principais requisitos técnicos da disciplina de Java Advanced:
+A API implementa os principais requisitos técnicos:
 
 * API REST com Spring Boot;
 * organização em camadas;
@@ -636,37 +613,12 @@ A API implementa os principais requisitos técnicos da disciplina de Java Advanc
 
 ## Links da entrega
 
-Preencher antes da entrega final:
-
-| Item                                | Link                          |
-| ----------------------------------- | ----------------------------- |
-| Repositório GitHub                  | `INSERIR_LINK_DO_REPOSITORIO` |
-| Deploy público                      | `INSERIR_LINK_DO_DEPLOY`      |
-| Swagger/OpenAPI                     | `INSERIR_LINK_DO_SWAGGER`     |
-| Vídeo de apresentação Java Advanced | `INSERIR_LINK_DO_VIDEO`       |
-| Vídeo Pitch                         | `INSERIR_LINK_DO_PITCH`       |
-
----
-
-## Status da entrega Java Advanced
-
-A API entrega um núcleo funcional do Amanajé, com:
-
-* cadastros de clientes, usuários, regiões e estações;
-* recebimento de telemetria IoT;
-* integração para observações climáticas externas;
-* cálculo de risco ambiental;
-* geração e resolução de alertas;
-* dashboard summary;
-* indicadores regionais;
-* persistência em Oracle;
-* validação real do schema Oracle com Hibernate;
-* Swagger/OpenAPI;
-* CORS;
-* HATEOAS em endpoints selecionados;
-* validações;
-* tratamento centralizado de erros;
-* README organizado;
-* estrutura preparada para integração com frontend, IoT, .NET, banco de dados e DevOps.
+| Item                                | Link                        |
+| ----------------------------------- | --------------------------- |
+| Repositório GitHub                  | https://github.com/gs-1-tdspo2/gs-java-advanced |
+| Deploy público                      | `INSERIR_LINK_DO_DEPLOY`    |
+| Swagger/OpenAPI                     | `INSERIR_LINK_DO_SWAGGER`   |
+| Vídeo de apresentação Java Advanced | `INSERIR_LINK_DO_VIDEO`     |
+| Vídeo Pitch                         | `INSERIR_LINK_DO_PITCH`     |
 
 ---
