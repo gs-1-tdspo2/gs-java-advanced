@@ -3,8 +3,8 @@ package br.com.fiap.amanaje.regioes.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import br.com.fiap.amanaje.regioes.TipoArea;
-import br.com.fiap.amanaje.regioes.TipoVisibilidade;
+import br.com.fiap.amanaje.regioes.enums.TipoArea;
+import br.com.fiap.amanaje.regioes.enums.TipoVisibilidade;
 
 public record RegiaoResponse(
 		Long idRegiao,

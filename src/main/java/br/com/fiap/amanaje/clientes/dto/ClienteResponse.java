@@ -2,7 +2,7 @@ package br.com.fiap.amanaje.clientes.dto;
 
 import java.time.LocalDateTime;
 
-import br.com.fiap.amanaje.clientes.TipoCliente;
+import br.com.fiap.amanaje.clientes.enums.TipoCliente;
 
 public record ClienteResponse(
 		Long idCliente,

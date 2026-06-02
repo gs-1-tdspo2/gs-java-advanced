@@ -1,7 +1,7 @@
 package br.com.fiap.amanaje.usuarios.dto;
 
-import br.com.fiap.amanaje.usuarios.PerfilUsuario;
-import br.com.fiap.amanaje.usuarios.StatusUsuario;
+import br.com.fiap.amanaje.usuarios.enums.PerfilUsuario;
+import br.com.fiap.amanaje.usuarios.enums.StatusUsuario;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

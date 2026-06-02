@@ -66,7 +66,19 @@ Outros tipos de cliente, como fazenda privada, cooperativa e pesquisa/universida
 ```text
 src/main/java/br/com/fiap/amanaje
 ├── alertas
+│   ├── controller
+│   ├── dto
+│   ├── enums
+│   ├── model
+│   ├── repository
+│   └── service
 ├── clientes
+│   ├── controller
+│   ├── dto
+│   ├── enums
+│   ├── model
+│   ├── repository
+│   └── service
 ├── common
 │   ├── auditoria
 │   ├── config
@@ -76,13 +88,55 @@ src/main/java/br/com/fiap/amanaje
 │   ├── processamento
 │   └── response
 ├── dashboard
+│   ├── controller
+│   ├── dto
+│   └── service
 ├── estacoes
+│   ├── controller
+│   ├── dto
+│   ├── enums
+│   ├── model
+│   ├── repository
+│   └── service
 ├── indicadores
+│   ├── controller
+│   ├── dto
+│   ├── model
+│   ├── repository
+│   └── service
 ├── leituras
+│   ├── controller
+│   ├── dto
+│   ├── model
+│   ├── repository
+│   └── service
 ├── observacoes
+│   ├── controller
+│   ├── dto
+│   ├── model
+│   ├── repository
+│   └── service
 ├── regioes
+│   ├── controller
+│   ├── dto
+│   ├── enums
+│   ├── model
+│   ├── repository
+│   └── service
 ├── riscos
+│   ├── controller
+│   ├── dto
+│   ├── enums
+│   ├── model
+│   ├── repository
+│   └── service
 ├── usuarios
+│   ├── controller
+│   ├── dto
+│   ├── enums
+│   ├── model
+│   ├── repository
+│   └── service
 └── AmanajeApiApplication.java
 ```
 
@@ -123,11 +177,11 @@ Quando a imagem estiver disponível, ela pode ser exibida abaixo:
 | `controller` | Expõe os endpoints REST da API                                             |
 | `service`    | Contém regras de negócio, validações e orquestração                        |
 | `repository` | Faz a comunicação com o banco via Spring Data JPA                          |
-| `entity`     | Mapeia as tabelas Oracle com JPA                                           |
+| `model`      | Mapeia as tabelas Oracle com JPA e agrupa modelos compartilhados           |
 | `dto`        | Records de entrada e saída das requisições                                 |
+| `enums`      | Enumerações de domínio                                                     |
 | `exception`  | Tratamento centralizado de erros                                           |
 | `config`     | Configurações da aplicação, CORS e Swagger/OpenAPI                         |
-| `model`      | Evidências de modelagem avançada, como `@MappedSuperclass` e `@Embeddable` |
 
 ---
 
@@ -599,10 +653,10 @@ Ela centraliza campos operacionais comuns, como status ativo e campos de auditor
 A modelagem embedded fica em:
 
 ```text
-src/main/java/br/com/fiap/amanaje/common/model/PeriodoExecucao.java
+src/main/java/br/com/fiap/amanaje/common/model/DadosRedeEstacao.java
 ```
 
-Esse objeto representa um período de execução utilizado em processamento técnico.
+Esse objeto agrupa dados opcionais de rede registrados em `LogStatusEstacao`.
 
 ### Múltiplas tabelas
 

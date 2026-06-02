@@ -1,5 +1,23 @@
 package br.com.fiap.amanaje.dashboard;
 
+import br.com.fiap.amanaje.dashboard.service.DashboardService;
+
+import br.com.fiap.amanaje.alertas.repository.AlertaRepository;
+
+import br.com.fiap.amanaje.riscos.repository.AvaliacaoRiscoRepository;
+
+import br.com.fiap.amanaje.observacoes.repository.ObservacaoClimaticaRepository;
+
+import br.com.fiap.amanaje.leituras.repository.LeituraIotRepository;
+
+import br.com.fiap.amanaje.estacoes.repository.EstacaoIotRepository;
+
+import br.com.fiap.amanaje.regioes.repository.RegiaoMonitoradaRepository;
+
+import br.com.fiap.amanaje.clientes.repository.ClienteRepository;
+
+import br.com.fiap.amanaje.clientes.service.ClienteService;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -7,25 +25,25 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import br.com.fiap.amanaje.alertas.Alerta;
-import br.com.fiap.amanaje.alertas.AlertaRepository;
-import br.com.fiap.amanaje.alertas.StatusAlerta;
-import br.com.fiap.amanaje.clientes.Cliente;
-import br.com.fiap.amanaje.clientes.ClienteRepository;
-import br.com.fiap.amanaje.clientes.ClienteService;
+import br.com.fiap.amanaje.alertas.model.Alerta;
+import br.com.fiap.amanaje.alertas.repository.AlertaRepository;
+import br.com.fiap.amanaje.alertas.enums.StatusAlerta;
+import br.com.fiap.amanaje.clientes.model.Cliente;
+import br.com.fiap.amanaje.clientes.repository.ClienteRepository;
+import br.com.fiap.amanaje.clientes.service.ClienteService;
 import br.com.fiap.amanaje.dashboard.dto.DashboardSummaryResponse;
-import br.com.fiap.amanaje.estacoes.EstacaoIot;
-import br.com.fiap.amanaje.estacoes.EstacaoIotRepository;
-import br.com.fiap.amanaje.leituras.LeituraIot;
-import br.com.fiap.amanaje.leituras.LeituraIotRepository;
-import br.com.fiap.amanaje.observacoes.ObservacaoClimatica;
-import br.com.fiap.amanaje.observacoes.ObservacaoClimaticaRepository;
-import br.com.fiap.amanaje.regioes.RegiaoMonitorada;
-import br.com.fiap.amanaje.regioes.RegiaoMonitoradaRepository;
-import br.com.fiap.amanaje.riscos.AvaliacaoRisco;
-import br.com.fiap.amanaje.riscos.AvaliacaoRiscoRepository;
-import br.com.fiap.amanaje.riscos.NivelRisco;
-import br.com.fiap.amanaje.riscos.TipoRisco;
+import br.com.fiap.amanaje.estacoes.model.EstacaoIot;
+import br.com.fiap.amanaje.estacoes.repository.EstacaoIotRepository;
+import br.com.fiap.amanaje.leituras.model.LeituraIot;
+import br.com.fiap.amanaje.leituras.repository.LeituraIotRepository;
+import br.com.fiap.amanaje.observacoes.model.ObservacaoClimatica;
+import br.com.fiap.amanaje.observacoes.repository.ObservacaoClimaticaRepository;
+import br.com.fiap.amanaje.regioes.model.RegiaoMonitorada;
+import br.com.fiap.amanaje.regioes.repository.RegiaoMonitoradaRepository;
+import br.com.fiap.amanaje.riscos.model.AvaliacaoRisco;
+import br.com.fiap.amanaje.riscos.repository.AvaliacaoRiscoRepository;
+import br.com.fiap.amanaje.riscos.enums.NivelRisco;
+import br.com.fiap.amanaje.riscos.enums.TipoRisco;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -3,8 +3,8 @@ package br.com.fiap.amanaje.riscos.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import br.com.fiap.amanaje.riscos.NivelRisco;
-import br.com.fiap.amanaje.riscos.TipoRisco;
+import br.com.fiap.amanaje.riscos.enums.NivelRisco;
+import br.com.fiap.amanaje.riscos.enums.TipoRisco;
 
 public record AvaliacaoRiscoResponse(
 		Long idAvaliacao,

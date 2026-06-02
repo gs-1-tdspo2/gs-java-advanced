@@ -2,7 +2,7 @@ package br.com.fiap.amanaje.dashboard.dto;
 
 import java.time.LocalDateTime;
 
-import br.com.fiap.amanaje.riscos.NivelRisco;
+import br.com.fiap.amanaje.riscos.enums.NivelRisco;
 
 public record DashboardSummaryResponse(
 		long totalClientesAtivos,

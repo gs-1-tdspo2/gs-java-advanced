@@ -2,8 +2,8 @@ package br.com.fiap.amanaje.regioes.dto;
 
 import java.math.BigDecimal;
 
-import br.com.fiap.amanaje.regioes.TipoArea;
-import br.com.fiap.amanaje.regioes.TipoVisibilidade;
+import br.com.fiap.amanaje.regioes.enums.TipoArea;
+import br.com.fiap.amanaje.regioes.enums.TipoVisibilidade;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;

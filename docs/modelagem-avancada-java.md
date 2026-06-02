@@ -14,7 +14,7 @@ A classe `EntidadeAuditavel`, em `br.com.fiap.amanaje.common.model`, concentra o
 - `ID_DEL_POR`
 - `DS_MOTIVO_EXCLUSAO`
 
-Entidades que herdam esse modelo:
+Entidades que herdam esse modelo nos subpacotes `model` dos respectivos dominios:
 
 - `Cliente`
 - `Usuario`
@@ -26,7 +26,7 @@ O mapeamento de `ST_ATIVO` preserva compatibilidade com Oracle `CHAR(1)` usando 
 
 ## Embedded com `@Embeddable`
 
-A classe `DadosRedeEstacao`, em `br.com.fiap.amanaje.common.model`, agrupa dados opcionais de rede de `LogStatusEstacao`:
+A classe `DadosRedeEstacao`, em `br.com.fiap.amanaje.common.model`, agrupa dados opcionais de rede de `br.com.fiap.amanaje.estacoes.model.LogStatusEstacao`:
 
 - `DS_IP_ADDRESS`
 - `DS_VERSAO_FIRMWARE`
