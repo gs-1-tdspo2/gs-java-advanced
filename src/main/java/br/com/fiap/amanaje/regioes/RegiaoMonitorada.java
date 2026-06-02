@@ -40,7 +40,7 @@ public class RegiaoMonitorada {
 	@Column(name = "NM_CIDADE")
 	private String cidade;
 
-	@Column(name = "SG_ESTADO")
+	@Column(name = "SG_ESTADO", length = 2, columnDefinition = "CHAR(2)")
 	private String estado;
 
 	@Column(name = "NR_LATITUDE")
@@ -60,7 +60,7 @@ public class RegiaoMonitorada {
 	@Column(name = "TP_VISIB")
 	private TipoVisibilidade tipoVisibilidade;
 
-	@Column(name = "ST_ATIVO")
+	@Column(name = "ST_ATIVO", length = 1, columnDefinition = "CHAR(1)")
 	private String stAtivo;
 
 	@Column(name = "DT_CRIADO_EM")

@@ -64,7 +64,7 @@ public class Alerta {
 	@Column(name = "DT_RESOLVIDO_EM")
 	private LocalDateTime dtResolvidoEm;
 
-	@Column(name = "ST_ATIVO")
+	@Column(name = "ST_ATIVO", length = 1, columnDefinition = "CHAR(1)")
 	private String stAtivo;
 
 	@Column(name = "DT_CRIADO_EM")

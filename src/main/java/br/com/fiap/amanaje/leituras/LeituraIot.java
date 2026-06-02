@@ -62,7 +62,7 @@ public class LeituraIot {
 	@Column(name = "DT_RECEBIDO_EM")
 	private LocalDateTime dtRecebidoEm;
 
-	@Column(name = "ST_VALIDA")
+	@Column(name = "ST_VALIDA", length = 1, columnDefinition = "CHAR(1)")
 	private String stValida;
 
 	@Column(name = "DS_MOTIVO_INVAL")
