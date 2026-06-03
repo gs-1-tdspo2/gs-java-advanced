@@ -6,12 +6,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class MqttProperties {
 
 	private boolean enabled = false;
-	private String brokerUrl = "tcp://broker.hivemq.com:1883";
+	private String brokerUrl = "tcp://mqtt-dashboard.com:1883";
 	private String clientId = "amanaje-java-api";
 	private String username = "";
 	private String password = "";
-	private String telemetryTopic = "amanaje/estacoes/+/telemetria";
-	private String feedbackTopicPattern = "amanaje/estacoes/%s/feedback";
+	private String telemetryTopic = "app/estacoes/+/telemetria";
+	private String statusTopic = "app/estacoes/+/status";
+	private String commandTopicPattern = "app/estacoes/%s/alertas";
 	private boolean evaluateRiskOnMessage = true;
 
 	public boolean isEnabled() {
@@ -62,12 +63,20 @@ public class MqttProperties {
 		this.telemetryTopic = telemetryTopic;
 	}
 
-	public String getFeedbackTopicPattern() {
-		return feedbackTopicPattern;
+	public String getStatusTopic() {
+		return statusTopic;
 	}
 
-	public void setFeedbackTopicPattern(String feedbackTopicPattern) {
-		this.feedbackTopicPattern = feedbackTopicPattern;
+	public void setStatusTopic(String statusTopic) {
+		this.statusTopic = statusTopic;
+	}
+
+	public String getCommandTopicPattern() {
+		return commandTopicPattern;
+	}
+
+	public void setCommandTopicPattern(String commandTopicPattern) {
+		this.commandTopicPattern = commandTopicPattern;
 	}
 
 	public boolean isEvaluateRiskOnMessage() {

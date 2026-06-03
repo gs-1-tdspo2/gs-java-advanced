@@ -6,14 +6,15 @@ import java.time.LocalDateTime;
 import br.com.fiap.amanaje.riscos.enums.NivelRisco;
 import br.com.fiap.amanaje.riscos.enums.TipoRisco;
 
-public record MqttFeedbackPayload(
-		String codigoEstacao,
-		Long idRegiao,
+public record MqttComandoAlertaPayload(
+		String stationCode,
 		NivelRisco nivelRisco,
 		TipoRisco tipoRiscoPrincipal,
 		BigDecimal score,
 		boolean alerta,
-		String led,
+		boolean ledVerde,
+		boolean ledVermelho,
+		boolean buzzer,
 		String mensagem,
 		LocalDateTime timestamp) {
 }

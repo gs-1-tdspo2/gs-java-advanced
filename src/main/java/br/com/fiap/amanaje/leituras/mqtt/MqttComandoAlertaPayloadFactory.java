@@ -11,41 +11,40 @@ import br.com.fiap.amanaje.riscos.enums.TipoRisco;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MqttFeedbackPayloadFactory {
+public class MqttComandoAlertaPayloadFactory {
 
-	public MqttFeedbackPayload fromRisk(String codigoEstacao, Long idRegiao, AvaliarRiscoResponse risco) {
+	public MqttComandoAlertaPayload fromRisk(String stationCode, AvaliarRiscoResponse risco) {
 		AvaliacaoRiscoResponse principal = risco.avaliacoes().stream()
 				.max(Comparator
 						.comparing(AvaliacaoRiscoResponse::scoreRisco)
 						.thenComparing(avaliacao -> avaliacao.tipoRisco().name()))
 				.orElseThrow();
 		return build(
-				codigoEstacao,
-				idRegiao,
+				stationCode,
 				principal.nivelRisco(),
 				principal.tipoRisco(),
 				principal.scoreRisco());
 	}
 
-	public MqttFeedbackPayload monitoringOnly(String codigoEstacao, Long idRegiao) {
-		return build(codigoEstacao, idRegiao, NivelRisco.BAIXO, null, BigDecimal.ZERO);
+	public MqttComandoAlertaPayload monitoringOnly(String stationCode) {
+		return build(stationCode, NivelRisco.BAIXO, null, BigDecimal.ZERO);
 	}
 
-	private MqttFeedbackPayload build(
-			String codigoEstacao,
-			Long idRegiao,
+	private MqttComandoAlertaPayload build(
+			String stationCode,
 			NivelRisco nivelRisco,
 			TipoRisco tipoRiscoPrincipal,
 			BigDecimal score) {
-		return new MqttFeedbackPayload(
-				codigoEstacao,
-				idRegiao,
+		return new MqttComandoAlertaPayload(
+				stationCode,
 				nivelRisco,
 				tipoRiscoPrincipal,
 				score,
-				LedStatusMapper.isAlerta(nivelRisco),
-				LedStatusMapper.toLed(nivelRisco),
-				LedStatusMapper.mensagem(nivelRisco),
+				MqttOutputMapper.isAlerta(nivelRisco),
+				MqttOutputMapper.ledVerde(nivelRisco),
+				MqttOutputMapper.ledVermelho(nivelRisco),
+				MqttOutputMapper.buzzer(nivelRisco),
+				MqttOutputMapper.mensagem(nivelRisco),
 				LocalDateTime.now());
 	}
 

@@ -17,46 +17,50 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @Component
-public class MqttFeedbackPublisher implements DisposableBean {
+public class MqttComandoAlertaPublisher implements DisposableBean {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MqttFeedbackPublisher.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MqttComandoAlertaPublisher.class);
 	private static final int QOS = 1;
 
 	private final MqttProperties properties;
 	private final ObjectMapper objectMapper;
 	private MqttClient client;
 
-	public MqttFeedbackPublisher(MqttProperties properties, ObjectMapper objectMapper) {
+	public MqttComandoAlertaPublisher(MqttProperties properties, ObjectMapper objectMapper) {
 		this.properties = properties;
 		this.objectMapper = objectMapper;
 	}
 
-	public void publish(MqttFeedbackPayload payload) {
+	public void publish(MqttComandoAlertaPayload payload) {
 		if (!properties.isEnabled()) {
 			return;
 		}
-		String topic = String.format(properties.getFeedbackTopicPattern(), payload.codigoEstacao());
+		String topic = topicFor(payload.stationCode());
 		try {
 			MqttClient mqttClient = connectedClient();
 			MqttMessage message = new MqttMessage(toJson(payload).getBytes(StandardCharsets.UTF_8));
 			message.setQos(QOS);
 			message.setRetained(false);
 			mqttClient.publish(topic, message);
-			LOGGER.info("Feedback MQTT publicado em topic={} codigoEstacao={} nivelRisco={}",
+			LOGGER.info("Comando/alerta MQTT publicado em topic={} stationCode={} nivelRisco={}",
 					topic,
-					payload.codigoEstacao(),
+					payload.stationCode(),
 					payload.nivelRisco());
 		}
 		catch (MqttException | JsonProcessingException ex) {
-			LOGGER.error("Falha ao publicar feedback MQTT em topic={} codigoEstacao={}: {}",
+			LOGGER.error("Falha ao publicar comando/alerta MQTT em topic={} stationCode={}: {}",
 					topic,
-					payload.codigoEstacao(),
+					payload.stationCode(),
 					ex.getMessage(),
 					ex);
 		}
 	}
 
-	private String toJson(MqttFeedbackPayload payload) throws JsonProcessingException {
+	String topicFor(String stationCode) {
+		return String.format(properties.getCommandTopicPattern(), stationCode);
+	}
+
+	private String toJson(MqttComandoAlertaPayload payload) throws JsonProcessingException {
 		return objectMapper.writeValueAsString(payload);
 	}
 

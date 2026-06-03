@@ -34,8 +34,9 @@ public class MqttLeituraSubscriber implements ApplicationRunner, DisposableBean 
 	private final ObjectMapper objectMapper;
 	private final LeituraIotService leituraService;
 	private final RiscoService riscoService;
-	private final MqttFeedbackPublisher feedbackPublisher;
-	private final MqttFeedbackPayloadFactory feedbackPayloadFactory;
+	private final MqttStatusService statusService;
+	private final MqttComandoAlertaPublisher comandoAlertaPublisher;
+	private final MqttComandoAlertaPayloadFactory comandoAlertaPayloadFactory;
 	private MqttClient client;
 
 	public MqttLeituraSubscriber(
@@ -43,14 +44,16 @@ public class MqttLeituraSubscriber implements ApplicationRunner, DisposableBean 
 			ObjectMapper objectMapper,
 			LeituraIotService leituraService,
 			RiscoService riscoService,
-			MqttFeedbackPublisher feedbackPublisher,
-			MqttFeedbackPayloadFactory feedbackPayloadFactory) {
+			MqttStatusService statusService,
+			MqttComandoAlertaPublisher comandoAlertaPublisher,
+			MqttComandoAlertaPayloadFactory comandoAlertaPayloadFactory) {
 		this.properties = properties;
 		this.objectMapper = objectMapper;
 		this.leituraService = leituraService;
 		this.riscoService = riscoService;
-		this.feedbackPublisher = feedbackPublisher;
-		this.feedbackPayloadFactory = feedbackPayloadFactory;
+		this.statusService = statusService;
+		this.comandoAlertaPublisher = comandoAlertaPublisher;
+		this.comandoAlertaPayloadFactory = comandoAlertaPayloadFactory;
 	}
 
 	@Override
@@ -64,14 +67,17 @@ public class MqttLeituraSubscriber implements ApplicationRunner, DisposableBean 
 			client.setCallback(callback());
 			client.connect(connectOptions());
 			client.subscribe(properties.getTelemetryTopic(), QOS, leituraListener());
-			LOGGER.info("MQTT conectado ao broker={} e inscrito em topic={}",
-					properties.getBrokerUrl(),
-					properties.getTelemetryTopic());
-		}
-		catch (MqttException ex) {
-			LOGGER.error("Falha ao conectar/subscrever MQTT no broker={} topic={}: {}",
+			client.subscribe(properties.getStatusTopic(), QOS, statusListener());
+			LOGGER.info("MQTT conectado ao broker={} e inscrito em telemetryTopic={} statusTopic={}",
 					properties.getBrokerUrl(),
 					properties.getTelemetryTopic(),
+					properties.getStatusTopic());
+		}
+		catch (MqttException ex) {
+			LOGGER.error("Falha ao conectar/subscrever MQTT no broker={} telemetryTopic={} statusTopic={}: {}",
+					properties.getBrokerUrl(),
+					properties.getTelemetryTopic(),
+					properties.getStatusTopic(),
 					ex.getMessage(),
 					ex);
 		}
@@ -121,21 +127,27 @@ public class MqttLeituraSubscriber implements ApplicationRunner, DisposableBean 
 		try {
 			if (client != null && client.isConnected()) {
 				client.subscribe(properties.getTelemetryTopic(), QOS, leituraListener());
+				client.subscribe(properties.getStatusTopic(), QOS, statusListener());
 			}
 		}
 		catch (MqttException ex) {
-			LOGGER.error("Falha ao reinscrever no topic MQTT {}: {}",
+			LOGGER.error("Falha ao reinscrever nos topics MQTT {} e {}: {}",
 					properties.getTelemetryTopic(),
+					properties.getStatusTopic(),
 					ex.getMessage(),
 					ex);
 		}
 	}
 
 	private IMqttMessageListener leituraListener() {
-		return this::handleMessage;
+		return this::handleTelemetryMessage;
 	}
 
-	void handleMessage(String topic, MqttMessage message) {
+	private IMqttMessageListener statusListener() {
+		return this::handleStatusMessage;
+	}
+
+	void handleTelemetryMessage(String topic, MqttMessage message) {
 		String rawPayload = new String(message.getPayload(), StandardCharsets.UTF_8);
 		try {
 			LOGGER.info("Leitura MQTT recebida topic={} payload={}", topic, rawPayload);
@@ -146,11 +158,31 @@ public class MqttLeituraSubscriber implements ApplicationRunner, DisposableBean 
 					leitura.idRegiao(),
 					payload.codigoEstacao());
 
-			MqttFeedbackPayload feedback = buildFeedback(payload, leitura);
-			feedbackPublisher.publish(feedback);
+			MqttComandoAlertaPayload comando = buildCommand(payload, leitura);
+			comandoAlertaPublisher.publish(comando);
 		}
 		catch (Exception ex) {
 			LOGGER.error("Erro ao processar leitura MQTT topic={} payload={}: {}",
+					topic,
+					rawPayload,
+					ex.getMessage(),
+					ex);
+		}
+	}
+
+	void handleStatusMessage(String topic, MqttMessage message) {
+		String rawPayload = new String(message.getPayload(), StandardCharsets.UTF_8);
+		try {
+			LOGGER.info("Status MQTT recebido topic={} payload={}", topic, rawPayload);
+			MqttStatusPayload payload = normalizeStatusPayload(objectMapper.readValue(rawPayload, MqttStatusPayload.class), topic);
+			statusService.registrar(payload);
+			LOGGER.info("Status MQTT registrado stationCode={} uptimeSeg={} rssi={}",
+					payload.stationCode(),
+					payload.uptimeSeg(),
+					payload.rssi());
+		}
+		catch (Exception ex) {
+			LOGGER.error("Erro ao processar status MQTT topic={} payload={}: {}",
 					topic,
 					rawPayload,
 					ex.getMessage(),
@@ -194,29 +226,51 @@ public class MqttLeituraSubscriber implements ApplicationRunner, DisposableBean 
 				payload.pm10());
 	}
 
+	private MqttStatusPayload normalizeStatusPayload(MqttStatusPayload payload, String topic) {
+		String stationCode = payload.stationCode();
+		String stationCodeTopic = extractStationCode(topic, "status");
+		if (!StringUtils.hasText(stationCode)) {
+			stationCode = stationCodeTopic;
+		}
+		else if (StringUtils.hasText(stationCodeTopic) && !stationCode.equals(stationCodeTopic)) {
+			LOGGER.warn("stationCode do status ({}) difere do topic MQTT ({})", stationCode, stationCodeTopic);
+		}
+		return new MqttStatusPayload(
+				stationCode,
+				payload.mac(),
+				payload.uptimeSeg(),
+				payload.rssi(),
+				payload.ip(),
+				payload.versaoFirmware());
+	}
+
 	private String extractCodigoEstacao(String topic) {
+		return extractStationCode(topic, "telemetria");
+	}
+
+	private String extractStationCode(String topic, String expectedSuffix) {
 		String[] parts = topic == null ? new String[0] : topic.split("/");
-		if (parts.length >= 4 && "estacoes".equals(parts[1]) && "telemetria".equals(parts[3])) {
+		if (parts.length >= 4 && "estacoes".equals(parts[1]) && expectedSuffix.equals(parts[3])) {
 			return parts[2];
 		}
 		return null;
 	}
 
-	private MqttFeedbackPayload buildFeedback(MqttLeituraPayload payload, LeituraIotResponse leitura) {
+	private MqttComandoAlertaPayload buildCommand(MqttLeituraPayload payload, LeituraIotResponse leitura) {
 		if (!properties.isEvaluateRiskOnMessage()) {
 			LOGGER.info("Avaliação de risco MQTT desabilitada para idRegiao={}", leitura.idRegiao());
-			return feedbackPayloadFactory.monitoringOnly(payload.codigoEstacao(), leitura.idRegiao());
+			return comandoAlertaPayloadFactory.monitoringOnly(payload.codigoEstacao());
 		}
 
 		AvaliarRiscoResponse risco = riscoService.avaliar(leitura.idRegiao());
-		MqttFeedbackPayload feedback = feedbackPayloadFactory.fromRisk(payload.codigoEstacao(), leitura.idRegiao(), risco);
+		MqttComandoAlertaPayload comando = comandoAlertaPayloadFactory.fromRisk(payload.codigoEstacao(), risco);
 		LOGGER.info("Risco MQTT avaliado idRegiao={} nivelRisco={} tipoRisco={} score={} alertasGerados={}",
 				leitura.idRegiao(),
-				feedback.nivelRisco(),
-				feedback.tipoRiscoPrincipal(),
-				feedback.score(),
+				comando.nivelRisco(),
+				comando.tipoRiscoPrincipal(),
+				comando.score(),
 				risco.alertas().size());
-		return feedback;
+		return comando;
 	}
 
 	@Override

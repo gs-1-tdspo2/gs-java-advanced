@@ -298,7 +298,8 @@ MQTT_CLIENT_ID
 MQTT_USERNAME
 MQTT_PASSWORD
 MQTT_TELEMETRY_TOPIC
-MQTT_FEEDBACK_TOPIC_PATTERN
+MQTT_STATUS_TOPIC
+MQTT_COMMAND_TOPIC_PATTERN
 MQTT_EVALUATE_RISK
 ```
 
@@ -471,93 +472,115 @@ O endpoint HTTP `POST /api/leituras` permanece disponível para Swagger, fronten
 
 #### Integração MQTT com HiveMQ/Wokwi
 
-O fluxo MQTT permite usar uma estação ESP32 simulada no Wokwi publicando telemetria no HiveMQ, sem substituir os endpoints HTTP existentes:
+O fluxo MQTT permite usar uma estação ESP32 simulada no Wokwi publicando telemetria e status no broker MQTT, sem substituir os endpoints HTTP existentes:
 
 ```text
-Wokwi/ESP32 → HiveMQ → Java subscriber → Oracle/risco/alerta → Java publisher → HiveMQ → ESP32 LED
+Wokwi/ESP32 → MQTT broker → Java subscriber → Oracle/risco/alerta → Java publisher → MQTT broker → ESP32 outputs
 ```
 
 O MQTT é opcional e vem desabilitado por padrão. Com `MQTT_ENABLED=false`, a aplicação inicia normalmente e nenhuma conexão com broker é tentada.
 
-Para habilitar localmente com o broker público da HiveMQ:
+Broker usado pelo Java e pelo ESP32:
+
+```text
+tcp://mqtt-dashboard.com:1883
+```
+
+Para habilitar localmente:
 
 ```powershell
 $env:MQTT_ENABLED="true"
-$env:MQTT_BROKER_URL="tcp://broker.hivemq.com:1883"
-$env:MQTT_TELEMETRY_TOPIC="amanaje/estacoes/+/telemetria"
-$env:MQTT_FEEDBACK_TOPIC_PATTERN="amanaje/estacoes/%s/feedback"
+$env:MQTT_BROKER_URL="tcp://mqtt-dashboard.com:1883"
+$env:MQTT_TELEMETRY_TOPIC="app/estacoes/+/telemetria"
+$env:MQTT_STATUS_TOPIC="app/estacoes/+/status"
+$env:MQTT_COMMAND_TOPIC_PATTERN="app/estacoes/%s/alertas"
+$env:MQTT_EVALUATE_RISK="true"
 .\mvnw.cmd spring-boot:run
 ```
 
-Tópico de entrada:
+Tópico de telemetria:
 
 ```text
-amanaje/estacoes/{codigoEstacao}/telemetria
+app/estacoes/{stationCode}/telemetria
 ```
 
-Tópico de saída:
+Tópico de status de hardware:
 
 ```text
-amanaje/estacoes/{codigoEstacao}/feedback
+app/estacoes/{stationCode}/status
+```
+
+Tópico de comando/alerta:
+
+```text
+app/estacoes/{stationCode}/alertas
 ```
 
 Exemplo de telemetria recebida:
 
 ```json
 {
-  "codigoEstacao": "AMANAJE-SP-RP-001",
-  "distanciaAguaCm": 80,
-  "nivelAguaPercentual": 73,
-  "inclinacaoGraus": 18.5,
-  "vibracao": 0.72,
-  "pressaoHpa": 998.4,
-  "pm25": 118,
-  "pm10": 180
+  "stationCode": "APP-ST-001",
+  "timestamp": "2026-06-03T18:36:35",
+  "waterDistanceCm": 399.94,
+  "waterLevelPercent": 0,
+  "tiltAngle": 0.00,
+  "vibration": 0.00,
+  "pressureHpa": 1013.27,
+  "pm25": 0.00,
+  "pm10": 0.00
 }
 ```
 
-Exemplo de feedback publicado:
+Exemplo de status de hardware recebido:
 
 ```json
 {
-  "codigoEstacao": "AMANAJE-SP-RP-001",
-  "idRegiao": 1,
+  "stationCode": "APP-ST-001",
+  "mac": "24:0A:C4:00:01:10",
+  "uptimeSeg": 24,
+  "rssi": -94,
+  "ip": "10.13.37.2",
+  "versaoFirmware": "1.4.0"
+}
+```
+
+O status persiste os campos compatíveis com o schema atual: estação, uptime, RSSI, IP, versão de firmware e data de registro. O campo `mac` é recebido e logado, mas não é persistido porque não há coluna correspondente no DDL atual.
+
+Exemplo de comando/alerta publicado:
+
+```json
+{
+  "stationCode": "APP-ST-001",
   "nivelRisco": "CRITICO",
   "tipoRiscoPrincipal": "ENCHENTE",
   "score": 88,
   "alerta": true,
-  "led": "RED",
+  "ledVerde": false,
+  "ledVermelho": true,
+  "buzzer": true,
   "mensagem": "Risco crítico detectado. Acionar alerta preventivo imediatamente.",
-  "timestamp": "2026-06-03T18:00:00"
+  "timestamp": "2026-06-03T18:40:00"
 }
 ```
 
-Quando `MQTT_EVALUATE_RISK=true`, cada leitura MQTT salva no Oracle aciona a avaliação de risco da região. A API reutiliza `LeituraIotService` para persistir a leitura e `RiscoService` para calcular risco e gerar alertas para níveis `ALTO` e `CRITICO`.
+Quando `MQTT_EVALUATE_RISK=true`, cada leitura MQTT salva no Oracle aciona a avaliação de risco da região. A API reutiliza `LeituraIotService` para persistir a leitura e `RiscoService` para calcular risco e gerar alertas para níveis `ALTO` e `CRITICO`. O endpoint HTTP `POST /api/leituras` continua disponível para Swagger, frontend, mobile e testes manuais.
 
-Mapeamento do LED:
+Saídas do ESP32:
 
-| Nível      | LED      | Alerta |
-| ---------- | -------- | ------ |
-| `BAIXO`    | `GREEN`  | não    |
-| `MODERADO` | `YELLOW` | não    |
-| `ALTO`     | `ORANGE` | sim    |
-| `CRITICO`  | `RED`    | sim    |
+* LED Verde = condição OK;
+* LED Vermelho = condição perigosa;
+* Buzzer = condição crítica/sirene;
+* OLED/Tela = informações de telemetria.
 
-Configuração para HiveMQ público:
+Mapeamento de comandos:
 
-```text
-MQTT_BROKER_URL=tcp://broker.hivemq.com:1883
-MQTT_USERNAME=
-MQTT_PASSWORD=
-```
-
-Configuração para HiveMQ Cloud:
-
-```text
-MQTT_BROKER_URL=ssl://YOUR_CLUSTER_URL:8883
-MQTT_USERNAME=YOUR_USERNAME
-MQTT_PASSWORD=YOUR_PASSWORD
-```
+| Nível      | Alerta | LED Verde | LED Vermelho | Buzzer |
+| ---------- | ------ | --------- | ------------ | ------ |
+| `BAIXO`    | não    | sim       | não          | não    |
+| `MODERADO` | não    | sim       | não          | não    |
+| `ALTO`     | sim    | não       | sim          | não    |
+| `CRITICO`  | sim    | não       | sim          | sim    |
 
 ---
 

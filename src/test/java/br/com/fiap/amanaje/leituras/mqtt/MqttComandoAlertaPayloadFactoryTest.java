@@ -12,12 +12,12 @@ import br.com.fiap.amanaje.riscos.enums.NivelRisco;
 import br.com.fiap.amanaje.riscos.enums.TipoRisco;
 import org.junit.jupiter.api.Test;
 
-class MqttFeedbackPayloadFactoryTest {
+class MqttComandoAlertaPayloadFactoryTest {
 
-	private final MqttFeedbackPayloadFactory factory = new MqttFeedbackPayloadFactory();
+	private final MqttComandoAlertaPayloadFactory factory = new MqttComandoAlertaPayloadFactory();
 
 	@Test
-	void shouldCreateFeedbackFromHighestRiskScore() {
+	void shouldCreateCommandFromHighestRiskScore() {
 		AvaliarRiscoResponse risco = new AvaliarRiscoResponse(
 				1L,
 				List.of(
@@ -26,15 +26,16 @@ class MqttFeedbackPayloadFactoryTest {
 						avaliacao(TipoRisco.QUALIDADE_AR, NivelRisco.CRITICO, "88")),
 				List.of());
 
-		MqttFeedbackPayload payload = factory.fromRisk("AMANAJE-SP-RP-001", 1L, risco);
+		MqttComandoAlertaPayload payload = factory.fromRisk("APP-ST-001", risco);
 
-		assertThat(payload.codigoEstacao()).isEqualTo("AMANAJE-SP-RP-001");
-		assertThat(payload.idRegiao()).isEqualTo(1L);
+		assertThat(payload.stationCode()).isEqualTo("APP-ST-001");
 		assertThat(payload.tipoRiscoPrincipal()).isEqualTo(TipoRisco.QUALIDADE_AR);
 		assertThat(payload.nivelRisco()).isEqualTo(NivelRisco.CRITICO);
 		assertThat(payload.score()).isEqualByComparingTo("88");
 		assertThat(payload.alerta()).isTrue();
-		assertThat(payload.led()).isEqualTo("RED");
+		assertThat(payload.ledVerde()).isFalse();
+		assertThat(payload.ledVermelho()).isTrue();
+		assertThat(payload.buzzer()).isTrue();
 		assertThat(payload.timestamp()).isNotNull();
 	}
 

@@ -22,10 +22,13 @@ class MqttLeituraSubscriberTest {
 	private RiscoService riscoService;
 
 	@Mock
-	private MqttFeedbackPublisher feedbackPublisher;
+	private MqttStatusService statusService;
 
 	@Mock
-	private MqttFeedbackPayloadFactory feedbackPayloadFactory;
+	private MqttComandoAlertaPublisher comandoAlertaPublisher;
+
+	@Mock
+	private MqttComandoAlertaPayloadFactory comandoAlertaPayloadFactory;
 
 	@Test
 	void shouldNotConnectOrProcessWhenDisabled() {
@@ -36,14 +39,16 @@ class MqttLeituraSubscriberTest {
 				new ObjectMapper(),
 				leituraService,
 				riscoService,
-				feedbackPublisher,
-				feedbackPayloadFactory);
+				statusService,
+				comandoAlertaPublisher,
+				comandoAlertaPayloadFactory);
 
 		subscriber.run(new DefaultApplicationArguments());
 
 		verify(leituraService, never()).criar(org.mockito.ArgumentMatchers.any());
 		verify(riscoService, never()).avaliar(org.mockito.ArgumentMatchers.any());
-		verify(feedbackPublisher, never()).publish(org.mockito.ArgumentMatchers.any());
+		verify(statusService, never()).registrar(org.mockito.ArgumentMatchers.any());
+		verify(comandoAlertaPublisher, never()).publish(org.mockito.ArgumentMatchers.any());
 	}
 
 }
