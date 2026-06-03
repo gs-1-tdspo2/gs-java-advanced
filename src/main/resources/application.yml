@@ -20,7 +20,7 @@ spring:
 
 amanaje:
   mqtt:
-    enabled: ${MQTT_ENABLED:false}
+    enabled: ${MQTT_ENABLED:true}
     broker-url: ${MQTT_BROKER_URL:tcp://mqtt-dashboard.com:1883}
     client-id: ${MQTT_CLIENT_ID:amanaje-java-api}
     username: ${MQTT_USERNAME:}
