@@ -55,6 +55,7 @@ Outros tipos de cliente, como fazenda privada, cooperativa e pesquisa/universida
 * Spring Boot DevTools
 * Spring HATEOAS
 * Swagger/OpenAPI com Springdoc
+* Eclipse Paho MQTT Client
 * Oracle Database
 * Maven
 * Docker e ambiente em nuvem serão tratados na etapa de DevOps
@@ -107,6 +108,7 @@ src/main/java/br/com/fiap/amanaje
 ├── leituras
 │   ├── controller
 │   ├── dto
+│   ├── mqtt
 │   ├── model
 │   ├── repository
 │   └── service
@@ -287,6 +289,21 @@ DB_USERNAME
 DB_PASSWORD
 ```
 
+Variáveis de ambiente opcionais para MQTT no Render:
+
+```text
+MQTT_ENABLED
+MQTT_BROKER_URL
+MQTT_CLIENT_ID
+MQTT_USERNAME
+MQTT_PASSWORD
+MQTT_TELEMETRY_TOPIC
+MQTT_FEEDBACK_TOPIC_PATTERN
+MQTT_EVALUATE_RISK
+```
+
+Mantenha `MQTT_ENABLED=false` até confirmar broker, credenciais e tópicos. Depois da confirmação, habilite o MQTT no Render apenas por variáveis de ambiente, sem credenciais fixas no código.
+
 O Render fornece a variável `PORT` automaticamente. A aplicação lê `PORT` antes de `SERVER_PORT`, mantendo `SERVER_PORT` e `8080` como fallbacks para execução local.
 
 O DDL Oracle precisa estar aplicado previamente no banco, pois a API mantém `spring.jpa.hibernate.ddl-auto: validate` e apenas valida o schema existente.
@@ -446,6 +463,100 @@ Exemplo de payload:
   "pm25": 118,
   "pm10": 180
 }
+```
+
+O endpoint HTTP `POST /api/leituras` permanece disponível para Swagger, frontend, mobile e testes manuais mesmo quando a integração MQTT estiver habilitada.
+
+---
+
+#### Integração MQTT com HiveMQ/Wokwi
+
+O fluxo MQTT permite usar uma estação ESP32 simulada no Wokwi publicando telemetria no HiveMQ, sem substituir os endpoints HTTP existentes:
+
+```text
+Wokwi/ESP32 → HiveMQ → Java subscriber → Oracle/risco/alerta → Java publisher → HiveMQ → ESP32 LED
+```
+
+O MQTT é opcional e vem desabilitado por padrão. Com `MQTT_ENABLED=false`, a aplicação inicia normalmente e nenhuma conexão com broker é tentada.
+
+Para habilitar localmente com o broker público da HiveMQ:
+
+```powershell
+$env:MQTT_ENABLED="true"
+$env:MQTT_BROKER_URL="tcp://broker.hivemq.com:1883"
+$env:MQTT_TELEMETRY_TOPIC="amanaje/estacoes/+/telemetria"
+$env:MQTT_FEEDBACK_TOPIC_PATTERN="amanaje/estacoes/%s/feedback"
+.\mvnw.cmd spring-boot:run
+```
+
+Tópico de entrada:
+
+```text
+amanaje/estacoes/{codigoEstacao}/telemetria
+```
+
+Tópico de saída:
+
+```text
+amanaje/estacoes/{codigoEstacao}/feedback
+```
+
+Exemplo de telemetria recebida:
+
+```json
+{
+  "codigoEstacao": "AMANAJE-SP-RP-001",
+  "distanciaAguaCm": 80,
+  "nivelAguaPercentual": 73,
+  "inclinacaoGraus": 18.5,
+  "vibracao": 0.72,
+  "pressaoHpa": 998.4,
+  "pm25": 118,
+  "pm10": 180
+}
+```
+
+Exemplo de feedback publicado:
+
+```json
+{
+  "codigoEstacao": "AMANAJE-SP-RP-001",
+  "idRegiao": 1,
+  "nivelRisco": "CRITICO",
+  "tipoRiscoPrincipal": "ENCHENTE",
+  "score": 88,
+  "alerta": true,
+  "led": "RED",
+  "mensagem": "Risco crítico detectado. Acionar alerta preventivo imediatamente.",
+  "timestamp": "2026-06-03T18:00:00"
+}
+```
+
+Quando `MQTT_EVALUATE_RISK=true`, cada leitura MQTT salva no Oracle aciona a avaliação de risco da região. A API reutiliza `LeituraIotService` para persistir a leitura e `RiscoService` para calcular risco e gerar alertas para níveis `ALTO` e `CRITICO`.
+
+Mapeamento do LED:
+
+| Nível      | LED      | Alerta |
+| ---------- | -------- | ------ |
+| `BAIXO`    | `GREEN`  | não    |
+| `MODERADO` | `YELLOW` | não    |
+| `ALTO`     | `ORANGE` | sim    |
+| `CRITICO`  | `RED`    | sim    |
+
+Configuração para HiveMQ público:
+
+```text
+MQTT_BROKER_URL=tcp://broker.hivemq.com:1883
+MQTT_USERNAME=
+MQTT_PASSWORD=
+```
+
+Configuração para HiveMQ Cloud:
+
+```text
+MQTT_BROKER_URL=ssl://YOUR_CLUSTER_URL:8883
+MQTT_USERNAME=YOUR_USERNAME
+MQTT_PASSWORD=YOUR_PASSWORD
 ```
 
 ---
