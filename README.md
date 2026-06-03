@@ -648,12 +648,15 @@ A API implementa os principais requisitos técnicos:
 
 ## Links da entrega
 
-| Item                                | Link                        |
-| ----------------------------------- | --------------------------- |
-| Repositório GitHub                  | https://github.com/gs-1-tdspo2/gs-java-advanced |
-| Deploy público                      | `INSERIR_LINK_DO_DEPLOY`    |
-| Swagger/OpenAPI                     | `INSERIR_LINK_DO_SWAGGER`   |
-| Vídeo de apresentação Java Advanced | `INSERIR_LINK_DO_VIDEO`     |
-| Vídeo Pitch                         | `INSERIR_LINK_DO_PITCH`     |
+
+| Item                              | Link |
+| --------------------------------- | ---- |
+| Repositório GitHub                | https://github.com/gs-1-tdspo2/gs-java-advanced |
+| Deploy público                    | https://gs-java-advanced.onrender.com |
+| Swagger/OpenAPI                   | https://gs-java-advanced.onrender.com/swagger-ui/index.html#/ |
+| Vídeo de apresentação Java Advanced | INSERIR_LINK_DO_VIDEO |
+| Vídeo Pitch                       | INSERIR_LINK_DO_PITCH |
+
+
 
 ---
