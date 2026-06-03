@@ -262,21 +262,24 @@ Resposta esperada:
 
 ## Deploy no Render
 
-Para publicar a API no Render, configure o serviço como **Web Service**.
+Para publicar a API no Render, configure o serviço como **Web Service** com **Language: Docker**.
 
-Build command:
+Configurações principais:
 
-```bash
-chmod +x mvnw && ./mvnw clean package -DskipTests
+```text
+Language: Docker
+Root Directory: vazio
+Dockerfile Path: ./Dockerfile
 ```
 
-Start command:
+O Dockerfile fica na raiz do repositório, compila a aplicação com o Maven Wrapper e executa o jar gerado:
 
 ```bash
-java -jar target/amanaje-api-0.0.1-SNAPSHOT.jar
+./mvnw clean package -DskipTests
+java -jar app.jar
 ```
 
-Variáveis de ambiente obrigatórias:
+Variáveis de ambiente obrigatórias no Render:
 
 ```text
 DB_URL
