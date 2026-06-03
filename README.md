@@ -55,6 +55,7 @@ Outros tipos de cliente, como fazenda privada, cooperativa e pesquisa/universida
 * Spring Boot DevTools
 * Spring HATEOAS
 * Swagger/OpenAPI com Springdoc
+* Eclipse Paho MQTT Client
 * Oracle Database
 * Maven
 * Docker e ambiente em nuvem serão tratados na etapa de DevOps
@@ -107,6 +108,7 @@ src/main/java/br/com/fiap/amanaje
 ├── leituras
 │   ├── controller
 │   ├── dto
+│   ├── mqtt
 │   ├── model
 │   ├── repository
 │   └── service
@@ -287,6 +289,22 @@ DB_USERNAME
 DB_PASSWORD
 ```
 
+Variáveis de ambiente opcionais para MQTT no Render:
+
+```text
+MQTT_ENABLED
+MQTT_BROKER_URL
+MQTT_CLIENT_ID
+MQTT_USERNAME
+MQTT_PASSWORD
+MQTT_TELEMETRY_TOPIC
+MQTT_STATUS_TOPIC
+MQTT_COMMAND_TOPIC_PATTERN
+MQTT_EVALUATE_RISK
+```
+
+Mantenha `MQTT_ENABLED=false` até confirmar broker, credenciais e tópicos. Depois da confirmação, habilite o MQTT no Render apenas por variáveis de ambiente, sem credenciais fixas no código.
+
 O Render fornece a variável `PORT` automaticamente. A aplicação lê `PORT` antes de `SERVER_PORT`, mantendo `SERVER_PORT` e `8080` como fallbacks para execução local.
 
 O DDL Oracle precisa estar aplicado previamente no banco, pois a API mantém `spring.jpa.hibernate.ddl-auto: validate` e apenas valida o schema existente.
@@ -447,6 +465,122 @@ Exemplo de payload:
   "pm10": 180
 }
 ```
+
+O endpoint HTTP `POST /api/leituras` permanece disponível para Swagger, frontend, mobile e testes manuais mesmo quando a integração MQTT estiver habilitada.
+
+---
+
+#### Integração MQTT com HiveMQ/Wokwi
+
+O fluxo MQTT permite usar uma estação ESP32 simulada no Wokwi publicando telemetria e status no broker MQTT, sem substituir os endpoints HTTP existentes:
+
+```text
+Wokwi/ESP32 → MQTT broker → Java subscriber → Oracle/risco/alerta → Java publisher → MQTT broker → ESP32 outputs
+```
+
+O MQTT é opcional e vem desabilitado por padrão. Com `MQTT_ENABLED=false`, a aplicação inicia normalmente e nenhuma conexão com broker é tentada.
+
+Broker usado pelo Java e pelo ESP32:
+
+```text
+tcp://mqtt-dashboard.com:1883
+```
+
+Para habilitar localmente:
+
+```powershell
+$env:MQTT_ENABLED="true"
+$env:MQTT_BROKER_URL="tcp://mqtt-dashboard.com:1883"
+$env:MQTT_TELEMETRY_TOPIC="app/estacoes/+/telemetria"
+$env:MQTT_STATUS_TOPIC="app/estacoes/+/status"
+$env:MQTT_COMMAND_TOPIC_PATTERN="app/estacoes/%s/alertas"
+$env:MQTT_EVALUATE_RISK="true"
+.\mvnw.cmd spring-boot:run
+```
+
+Tópico de telemetria:
+
+```text
+app/estacoes/{stationCode}/telemetria
+```
+
+Tópico de status de hardware:
+
+```text
+app/estacoes/{stationCode}/status
+```
+
+Tópico de comando/alerta:
+
+```text
+app/estacoes/{stationCode}/alertas
+```
+
+Exemplo de telemetria recebida:
+
+```json
+{
+  "stationCode": "APP-ST-001",
+  "timestamp": "2026-06-03T18:36:35",
+  "waterDistanceCm": 399.94,
+  "waterLevelPercent": 0,
+  "tiltAngle": 0.00,
+  "vibration": 0.00,
+  "pressureHpa": 1013.27,
+  "pm25": 0.00,
+  "pm10": 0.00
+}
+```
+
+Exemplo de status de hardware recebido:
+
+```json
+{
+  "stationCode": "APP-ST-001",
+  "mac": "24:0A:C4:00:01:10",
+  "uptimeSeg": 24,
+  "rssi": -94,
+  "ip": "10.13.37.2",
+  "versaoFirmware": "1.4.0"
+}
+```
+
+O status persiste os campos compatíveis com o schema atual: estação, uptime, RSSI, IP, versão de firmware e data de registro. O campo `mac` é recebido e logado, mas não é persistido porque não há coluna correspondente no DDL atual.
+
+Exemplo de comando/alerta publicado:
+
+```json
+{
+  "stationCode": "APP-ST-001",
+  "nivelRisco": "CRITICO",
+  "tipoRiscoPrincipal": "ENCHENTE",
+  "score": 88,
+  "alerta": true,
+  "ledVerde": false,
+  "ledVermelho": true,
+  "buzzer": true,
+  "mensagem": "Risco crítico detectado. Acionar alerta preventivo imediatamente.",
+  "timestamp": "2026-06-03T18:40:00"
+}
+```
+
+Quando `MQTT_EVALUATE_RISK=true`, cada leitura MQTT salva no Oracle aciona a avaliação de risco da região. A API reutiliza `LeituraIotService` para persistir a leitura e `RiscoService` para calcular risco e gerar alertas para níveis `ALTO` e `CRITICO`. O endpoint HTTP `POST /api/leituras` continua disponível para Swagger, frontend, mobile e testes manuais.
+
+Saídas do ESP32:
+
+* LED Verde = condição OK;
+* LED Vermelho = condição perigosa;
+* Buzzer = condição crítica/sirene;
+* OLED/Tela = informações de telemetria.
+
+Mapeamento de comandos:
+
+| Nível      | Alerta | LED Verde | LED Vermelho | Buzzer |
+| ---------- | ------ | --------- | ------------ | ------ |
+| `BAIXO`    | não    | sim       | não          | não    |
+| `MODERADO` | não    | sim       | não          | não    |
+| `ALTO`     | sim    | não       | sim          | não    |
+| `CRITICO`  | sim    | não       | sim          | sim    |
 
 ---
 
