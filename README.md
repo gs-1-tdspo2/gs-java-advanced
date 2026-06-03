@@ -260,6 +260,38 @@ Resposta esperada:
 
 ---
 
+## Deploy no Render
+
+Para publicar a API no Render, configure o serviço como **Web Service**.
+
+Build command:
+
+```bash
+chmod +x mvnw && ./mvnw clean package -DskipTests
+```
+
+Start command:
+
+```bash
+java -jar target/amanaje-api-0.0.1-SNAPSHOT.jar
+```
+
+Variáveis de ambiente obrigatórias:
+
+```text
+DB_URL
+DB_USERNAME
+DB_PASSWORD
+```
+
+O Render fornece a variável `PORT` automaticamente. A aplicação lê `PORT` antes de `SERVER_PORT`, mantendo `SERVER_PORT` e `8080` como fallbacks para execução local.
+
+O DDL Oracle precisa estar aplicado previamente no banco, pois a API mantém `spring.jpa.hibernate.ddl-auto: validate` e apenas valida o schema existente.
+
+Se a aplicação falhar no Render com erro de banco ou rede, o Oracle FIAP pode não estar acessível a partir do ambiente em nuvem do Render.
+
+---
+
 ## Swagger / OpenAPI
 
 Com a aplicação em execução, a documentação Swagger pode ser acessada em:
