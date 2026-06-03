@@ -260,6 +260,41 @@ Resposta esperada:
 
 ---
 
+## Deploy no Render
+
+Para publicar a API no Render, configure o serviço como **Web Service** com **Language: Docker**.
+
+Configurações principais:
+
+```text
+Language: Docker
+Root Directory: vazio
+Dockerfile Path: ./Dockerfile
+```
+
+O Dockerfile fica na raiz do repositório, compila a aplicação com o Maven Wrapper e executa o jar gerado:
+
+```bash
+./mvnw clean package -DskipTests
+java -jar app.jar
+```
+
+Variáveis de ambiente obrigatórias no Render:
+
+```text
+DB_URL
+DB_USERNAME
+DB_PASSWORD
+```
+
+O Render fornece a variável `PORT` automaticamente. A aplicação lê `PORT` antes de `SERVER_PORT`, mantendo `SERVER_PORT` e `8080` como fallbacks para execução local.
+
+O DDL Oracle precisa estar aplicado previamente no banco, pois a API mantém `spring.jpa.hibernate.ddl-auto: validate` e apenas valida o schema existente.
+
+Se a aplicação falhar no Render com erro de banco ou rede, o Oracle FIAP pode não estar acessível a partir do ambiente em nuvem do Render.
+
+---
+
 ## Swagger / OpenAPI
 
 Com a aplicação em execução, a documentação Swagger pode ser acessada em:
