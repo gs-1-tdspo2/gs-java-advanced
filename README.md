@@ -289,6 +289,20 @@ DB_USERNAME
 DB_PASSWORD
 ```
 
+Variável de ambiente opcional para liberar frontends locais ou publicados via CORS:
+
+```text
+CORS_ALLOWED_ORIGINS
+```
+
+Exemplo para desenvolvimento com Expo web/local:
+
+```text
+CORS_ALLOWED_ORIGINS=http://localhost:8082,http://127.0.0.1:8082,http://localhost:19006,http://localhost:3000
+```
+
+Para um frontend publicado em produção, adicione também a URL pública do frontend nessa lista.
+
 Variáveis de ambiente opcionais para MQTT no Render:
 
 ```text
