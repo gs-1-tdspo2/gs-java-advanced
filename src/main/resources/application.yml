@@ -20,7 +20,7 @@ spring:
 
 amanaje:
   cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8082,http://127.0.0.1:8082,http://localhost:19006,http://127.0.0.1:19006,http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173}
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8082,http://127.0.0.1:8082,http://localhost:19006,http://127.0.0.1:19006,http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173,https://amanaje-no2er0rxy-guscrevelaris-projects.vercel.app}
   mqtt:
     enabled: ${MQTT_ENABLED:true}
     broker-url: ${MQTT_BROKER_URL:tcp://mqtt-dashboard.com:1883}
