@@ -1,28 +1,19 @@
 package br.com.fiap.amanaje.regioes.controller;
 
-import br.com.fiap.amanaje.leituras.controller.LeituraIotController;
-
-import br.com.fiap.amanaje.estacoes.controller.EstacaoIotController;
-
 import br.com.fiap.amanaje.regioes.enums.TipoVisibilidade;
 
 import br.com.fiap.amanaje.regioes.service.RegiaoMonitoradaService;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
 
-import br.com.fiap.amanaje.estacoes.controller.EstacaoIotController;
-import br.com.fiap.amanaje.leituras.controller.LeituraIotController;
 import br.com.fiap.amanaje.regioes.dto.RegiaoCreateRequest;
 import br.com.fiap.amanaje.regioes.dto.RegiaoResponse;
 import br.com.fiap.amanaje.regioes.dto.RegiaoUpdateRequest;
-import br.com.fiap.amanaje.riscos.controller.RiscoController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,7 +41,7 @@ public class RegiaoMonitoradaController {
 	public ResponseEntity<RegiaoResponse> criar(@Valid @RequestBody RegiaoCreateRequest request) {
 		RegiaoResponse response = regiaoService.criar(request);
 		return ResponseEntity
-				.created(linkTo(methodOn(RegiaoMonitoradaController.class).buscarPorId(response.idRegiao())).toUri())
+				.created(linkTo(RegiaoMonitoradaController.class).slash(response.idRegiao()).toUri())
 				.body(response);
 	}
 
@@ -66,14 +57,8 @@ public class RegiaoMonitoradaController {
 
 	@GetMapping("/{id}")
 	@Operation(summary = "Buscar região monitorada ativa por ID")
-	public EntityModel<RegiaoResponse> buscarPorId(@PathVariable Long id) {
-		RegiaoResponse response = regiaoService.buscarPorId(id);
-		return EntityModel.of(
-				response,
-				linkTo(methodOn(RegiaoMonitoradaController.class).buscarPorId(id)).withSelfRel(),
-				linkTo(methodOn(EstacaoIotController.class).listarPorRegiao(id)).withRel("estacoes"),
-				linkTo(methodOn(LeituraIotController.class).listarPorRegiao(id)).withRel("leituras"),
-				linkTo(methodOn(RiscoController.class).buscarAtual(id)).withRel("riscoAtual"));
+	public RegiaoResponse buscarPorId(@PathVariable Long id) {
+		return regiaoService.buscarPorId(id);
 	}
 
 	@PutMapping("/{id}")
