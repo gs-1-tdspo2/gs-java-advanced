@@ -67,7 +67,7 @@ class ObservacaoClimaticaServiceTest {
 	@Test
 	void shouldReturnNotFoundWhenRegionHasNoClimateObservation() {
 		when(regiaoService.buscarAtiva(20L)).thenReturn(RegiaoMonitorada.builder().idRegiao(20L).build());
-		when(observacaoRepository.findFirstByIdRegiaoOrderByDtObservacaoDesc(20L))
+		when(observacaoRepository.findFirstByIdRegiaoOrderByDtObservacaoDescDtCriadoEmDesc(20L))
 				.thenReturn(Optional.empty());
 
 		assertThatThrownBy(() -> observacaoService.buscarUltimaPorRegiao(20L))

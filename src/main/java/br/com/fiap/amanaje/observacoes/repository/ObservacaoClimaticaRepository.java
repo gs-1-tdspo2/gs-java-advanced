@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ObservacaoClimaticaRepository extends JpaRepository<ObservacaoClimatica, Long> {
 
-	Optional<ObservacaoClimatica> findFirstByIdRegiaoOrderByDtObservacaoDesc(Long idRegiao);
+	Optional<ObservacaoClimatica> findFirstByIdRegiaoOrderByDtObservacaoDescDtCriadoEmDesc(Long idRegiao);
 
 }

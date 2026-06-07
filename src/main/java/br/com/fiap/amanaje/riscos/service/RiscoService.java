@@ -42,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RiscoService {
 
 	private static final String VALIDA = "S";
+	private static final long OBSERVACAO_CLIMATICA_MAX_AGE_HOURS = 6;
 
 	private final AvaliacaoRiscoRepository avaliacaoRepository;
 	private final LeituraIotRepository leituraRepository;
@@ -65,21 +66,28 @@ public class RiscoService {
 	@Transactional
 	public AvaliarRiscoResponse avaliar(Long idRegiao) {
 		regiaoService.buscarAtiva(idRegiao);
+		LocalDateTime agora = LocalDateTime.now();
 		Optional<LeituraIot> leitura = leituraRepository
 				.findFirstByIdRegiaoAndStValidaOrderByDtLeituraDesc(idRegiao, VALIDA);
-		Optional<ObservacaoClimatica> observacao = observacaoRepository
-				.findFirstByIdRegiaoOrderByDtObservacaoDesc(idRegiao);
+		Optional<ObservacaoClimatica> ultimaObservacao = observacaoRepository
+				.findFirstByIdRegiaoOrderByDtObservacaoDescDtCriadoEmDesc(idRegiao);
+		Optional<ObservacaoClimatica> observacao = ultimaObservacao
+				.filter(item -> isObservacaoClimaticaRecente(item, agora));
+		boolean observacaoClimaticaIgnorada = ultimaObservacao.isPresent() && observacao.isEmpty();
 		if (leitura.isEmpty() && observacao.isEmpty()) {
 			throw new BusinessRuleException("Não há leitura IoT válida nem observação climática para avaliar a região: "
 					+ idRegiao);
 		}
 
-		LocalDateTime agora = LocalDateTime.now();
 		List<AvaliacaoRisco> avaliacoes = List.of(
-				criarAvaliacao(idRegiao, TipoRisco.ENCHENTE, leitura.orElse(null), observacao.orElse(null), agora),
-				criarAvaliacao(idRegiao, TipoRisco.DESLIZAMENTO, leitura.orElse(null), observacao.orElse(null), agora),
-				criarAvaliacao(idRegiao, TipoRisco.TEMPESTADE, leitura.orElse(null), observacao.orElse(null), agora),
-				criarAvaliacao(idRegiao, TipoRisco.QUALIDADE_AR, leitura.orElse(null), observacao.orElse(null), agora));
+				criarAvaliacao(idRegiao, TipoRisco.ENCHENTE, leitura.orElse(null), observacao.orElse(null), agora,
+						observacaoClimaticaIgnorada),
+				criarAvaliacao(idRegiao, TipoRisco.DESLIZAMENTO, leitura.orElse(null), observacao.orElse(null), agora,
+						observacaoClimaticaIgnorada),
+				criarAvaliacao(idRegiao, TipoRisco.TEMPESTADE, leitura.orElse(null), observacao.orElse(null), agora,
+						observacaoClimaticaIgnorada),
+				criarAvaliacao(idRegiao, TipoRisco.QUALIDADE_AR, leitura.orElse(null), observacao.orElse(null), agora,
+						observacaoClimaticaIgnorada));
 
 		List<AlertaResponse> alertas = avaliacoes.stream()
 				.map(alertaService::gerarSeNecessario)
@@ -116,16 +124,19 @@ public class RiscoService {
 	}
 
 	BigDecimal calculateEnchenteScore(LeituraIot leitura, ObservacaoClimatica observacao) {
+		// IoT water telemetry is primary; recent rainfall can raise flood risk when available.
 		double score = contribution(leitura == null ? null : leitura.getNivelAguaPercentual(), 100, 60)
 				+ inverseContribution(leitura == null ? null : leitura.getDistanciaAguaCm(), 100, 25)
-				+ contribution(observacao == null ? null : observacao.getPrecipitacaoMm(), 100, 15);
+				+ contribution(observacao == null ? null : observacao.getPrecipitacaoMm(), 100, 25);
 		return clampScore(score);
 	}
 
 	BigDecimal calculateDeslizamentoScore(LeituraIot leitura, ObservacaoClimatica observacao) {
+		// Movement sensors are primary; rainfall and humidity add terrain saturation context.
 		double score = contribution(leitura == null ? null : leitura.getInclinacaoGraus(), 45, 45)
 				+ contribution(leitura == null ? null : leitura.getVibracao(), 10, 30)
-				+ contribution(observacao == null ? null : observacao.getPrecipitacaoMm(), 100, 25);
+				+ contribution(observacao == null ? null : observacao.getPrecipitacaoMm(), 100, 25)
+				+ contribution(observacao == null ? null : observacao.getUmidadePercentual(), 100, 10);
 		return clampScore(score);
 	}
 
@@ -133,16 +144,19 @@ public class RiscoService {
 		BigDecimal pressao = leitura != null && leitura.getPressaoHpa() != null
 				? leitura.getPressaoHpa()
 				: observacao == null ? null : observacao.getPressaoHpa();
+		// Pressure is single-sourced to avoid double counting; wind and rain come from climate observation.
 		double score = pressureContribution(pressao)
 				+ contribution(observacao == null ? null : observacao.getVentoKmh(), 100, 35)
 				+ contribution(observacao == null ? null : observacao.getPrecipitacaoMm(), 100, 25);
 		return clampScore(score);
 	}
 
-	BigDecimal calculateQualidadeArScore(LeituraIot leitura) {
-		double score = contribution(leitura == null ? null : leitura.getPm25(), 75, 60)
+	BigDecimal calculateQualidadeArScore(LeituraIot leitura, ObservacaoClimatica observacao) {
+		double baseScore = contribution(leitura == null ? null : leitura.getPm25(), 75, 60)
 				+ contribution(leitura == null ? null : leitura.getPm10(), 150, 40);
-		return clampScore(score);
+		// PM2.5/PM10 remain primary; weather only applies a small dispersion modifier.
+		double modifier = qualidadeArMeteoModifier(observacao);
+		return clampScore(baseScore + modifier);
 	}
 
 	BigDecimal clampScore(double score) {
@@ -168,12 +182,13 @@ public class RiscoService {
 			TipoRisco tipoRisco,
 			LeituraIot leitura,
 			ObservacaoClimatica observacao,
-			LocalDateTime agora) {
+			LocalDateTime agora,
+			boolean observacaoClimaticaIgnorada) {
 		BigDecimal score = switch (tipoRisco) {
 			case ENCHENTE -> calculateEnchenteScore(leitura, observacao);
 			case DESLIZAMENTO -> calculateDeslizamentoScore(leitura, observacao);
 			case TEMPESTADE -> calculateTempestadeScore(leitura, observacao);
-			case QUALIDADE_AR -> calculateQualidadeArScore(leitura);
+			case QUALIDADE_AR -> calculateQualidadeArScore(leitura, observacao);
 		};
 		AvaliacaoRisco avaliacao = AvaliacaoRisco.builder()
 				.idRegiao(idRegiao)
@@ -182,7 +197,7 @@ public class RiscoService {
 				.tipoRisco(tipoRisco)
 				.scoreRisco(score)
 				.nivelRisco(resolveNivelRisco(score))
-				.motivo(criarMotivo(tipoRisco))
+				.motivo(criarMotivo(tipoRisco, leitura, observacao, observacaoClimaticaIgnorada))
 				.dtAvaliacao(agora)
 				.build();
 		return avaliacaoRepository.save(avaliacao);
@@ -211,13 +226,75 @@ public class RiscoService {
 		return Math.max(0, Math.min(normalized, 40));
 	}
 
-	private String criarMotivo(TipoRisco tipoRisco) {
+	private double qualidadeArMeteoModifier(ObservacaoClimatica observacao) {
+		if (observacao == null) {
+			return 0;
+		}
+		double modifier = 0;
+		BigDecimal vento = observacao.getVentoKmh();
+		if (vento != null && vento.compareTo(BigDecimal.valueOf(5)) < 0) {
+			modifier += 10;
+		}
+		else if (vento != null && vento.compareTo(BigDecimal.valueOf(10)) < 0) {
+			modifier += 5;
+		}
+		BigDecimal umidade = observacao.getUmidadePercentual();
+		if (umidade != null && umidade.compareTo(BigDecimal.valueOf(90)) >= 0) {
+			modifier += 5;
+		}
+		else if (umidade != null && umidade.compareTo(BigDecimal.valueOf(80)) >= 0) {
+			modifier += 3;
+		}
+		BigDecimal chuva = observacao.getPrecipitacaoMm();
+		if (chuva != null && chuva.compareTo(BigDecimal.valueOf(10)) >= 0) {
+			modifier -= 10;
+		}
+		else if (chuva != null && chuva.compareTo(BigDecimal.valueOf(2.5)) >= 0) {
+			modifier -= 5;
+		}
+		return Math.max(-10, Math.min(15, modifier));
+	}
+
+	private boolean isObservacaoClimaticaRecente(ObservacaoClimatica observacao, LocalDateTime agora) {
+		LocalDateTime dataReferencia = observacao.getDtObservacao() != null
+				? observacao.getDtObservacao()
+				: observacao.getDtCriadoEm();
+		return dataReferencia != null
+				&& !dataReferencia.isAfter(agora)
+				&& !dataReferencia.isBefore(agora.minusHours(OBSERVACAO_CLIMATICA_MAX_AGE_HOURS));
+	}
+
+	private String criarMotivo(
+			TipoRisco tipoRisco,
+			LeituraIot leitura,
+			ObservacaoClimatica observacao,
+			boolean observacaoClimaticaIgnorada) {
+		String origem = criarDescricaoOrigem(leitura, observacao, observacaoClimaticaIgnorada);
 		return switch (tipoRisco) {
-			case ENCHENTE -> "Cálculo baseado em nível da água, distância da água e precipitação disponíveis.";
-			case DESLIZAMENTO -> "Cálculo baseado em inclinação, vibração e precipitação disponíveis.";
-			case TEMPESTADE -> "Cálculo baseado em pressão atmosférica, vento e precipitação disponíveis.";
-			case QUALIDADE_AR -> "Cálculo baseado em partículas PM2.5 e PM10 disponíveis.";
+			case ENCHENTE -> "Risco calculado com base em leitura IoT de nível da água e precipitação observada. "
+					+ origem;
+			case DESLIZAMENTO -> "Risco calculado com base em inclinação, vibração, precipitação e umidade observadas. "
+					+ origem;
+			case TEMPESTADE -> "Risco calculado com base em pressão atmosférica, vento e precipitação observadas. "
+					+ origem;
+			case QUALIDADE_AR -> "Risco de qualidade do ar baseado em PM2.5/PM10, ajustado por condições meteorológicas. "
+					+ origem;
 		};
+	}
+
+	private String criarDescricaoOrigem(
+			LeituraIot leitura,
+			ObservacaoClimatica observacao,
+			boolean observacaoClimaticaIgnorada) {
+		if (leitura != null && observacao != null) {
+			return "Foram usadas telemetria IoT válida e observação climática recente.";
+		}
+		if (leitura != null) {
+			return observacaoClimaticaIgnorada
+					? "Sem observação climática recente; cálculo baseado apenas em telemetria IoT."
+					: "Sem observação climática disponível; cálculo baseado apenas em telemetria IoT.";
+		}
+		return "Sem telemetria IoT válida recente; cálculo baseado apenas em observação climática recente.";
 	}
 
 	private AvaliacaoRiscoResponse toResponse(AvaliacaoRisco avaliacao) {

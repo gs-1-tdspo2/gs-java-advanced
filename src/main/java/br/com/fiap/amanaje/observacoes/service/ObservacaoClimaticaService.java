@@ -54,7 +54,7 @@ public class ObservacaoClimaticaService {
 	@Transactional(readOnly = true)
 	public ObservacaoClimaticaResponse buscarUltimaPorRegiao(Long idRegiao) {
 		regiaoService.buscarAtiva(idRegiao);
-		return observacaoRepository.findFirstByIdRegiaoOrderByDtObservacaoDesc(idRegiao)
+		return observacaoRepository.findFirstByIdRegiaoOrderByDtObservacaoDescDtCriadoEmDesc(idRegiao)
 				.map(this::toResponse)
 				.orElseThrow(() -> new ResourceNotFoundException(
 						"Nenhuma observação climática encontrada para a região: " + idRegiao));
