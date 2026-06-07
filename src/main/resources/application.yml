@@ -21,6 +21,9 @@ spring:
 amanaje:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8082,http://127.0.0.1:8082,https://amanaje.vercel.app}
+  leituras:
+    http:
+      evaluate-risk: ${HTTP_EVALUATE_RISK:true}
   mqtt:
     enabled: ${MQTT_ENABLED:true}
     broker-url: ${MQTT_BROKER_URL:tcp://mqtt-dashboard.com:1883}

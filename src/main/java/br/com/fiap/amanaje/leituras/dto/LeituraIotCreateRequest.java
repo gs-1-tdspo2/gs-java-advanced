@@ -14,10 +14,15 @@ public record LeituraIotCreateRequest(
 		@Positive Long idEstacao,
 		@JsonAlias("stationCode") @Size(max = 40) String codigoEstacao,
 		@JsonAlias("timestamp") LocalDateTime dtLeitura,
+		@JsonAlias("waterDistanceCm")
 		BigDecimal distanciaAguaCm,
+		@JsonAlias("waterLevelPercent")
 		@DecimalMin("0") @DecimalMax("100") BigDecimal nivelAguaPercentual,
+		@JsonAlias("tiltAngle")
 		BigDecimal inclinacaoGraus,
+		@JsonAlias("vibration")
 		BigDecimal vibracao,
+		@JsonAlias("pressureHpa")
 		@DecimalMin("800") @DecimalMax("1200") BigDecimal pressaoHpa,
 		@PositiveOrZero BigDecimal pm25,
 		@PositiveOrZero BigDecimal pm10) {
