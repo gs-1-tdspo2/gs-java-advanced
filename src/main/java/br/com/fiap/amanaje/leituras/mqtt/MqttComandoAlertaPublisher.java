@@ -79,6 +79,8 @@ public class MqttComandoAlertaPublisher implements DisposableBean {
 		MqttConnectOptions options = new MqttConnectOptions();
 		options.setCleanSession(true);
 		options.setAutomaticReconnect(true);
+		options.setConnectionTimeout(properties.getConnectionTimeoutSeconds());
+		options.setKeepAliveInterval(properties.getKeepAliveIntervalSeconds());
 		if (StringUtils.hasText(properties.getUsername())) {
 			options.setUserName(properties.getUsername());
 		}

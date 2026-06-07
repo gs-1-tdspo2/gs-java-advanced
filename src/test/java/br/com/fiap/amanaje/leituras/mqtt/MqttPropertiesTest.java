@@ -19,6 +19,8 @@ class MqttPropertiesTest {
 		assertThat(properties.getStatusTopic()).isEqualTo("app/estacoes/+/status");
 		assertThat(properties.getCommandTopicPattern()).isEqualTo("app/estacoes/%s/alertas");
 		assertThat(properties.isEvaluateRiskOnMessage()).isTrue();
+		assertThat(properties.getConnectionTimeoutSeconds()).isEqualTo(5);
+		assertThat(properties.getKeepAliveIntervalSeconds()).isEqualTo(30);
 	}
 
 }

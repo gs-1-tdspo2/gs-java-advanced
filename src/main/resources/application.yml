@@ -9,6 +9,12 @@ spring:
     username: ${DB_USERNAME:RM561996}
     password: ${DB_PASSWORD:230602}
     driver-class-name: oracle.jdbc.OracleDriver
+    hikari:
+      connection-timeout: ${DB_CONNECTION_TIMEOUT_MS:10000}
+      validation-timeout: ${DB_VALIDATION_TIMEOUT_MS:5000}
+      data-source-properties:
+        oracle.net.CONNECT_TIMEOUT: ${DB_ORACLE_CONNECT_TIMEOUT_MS:10000}
+        oracle.jdbc.ReadTimeout: ${DB_ORACLE_READ_TIMEOUT_MS:30000}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -34,3 +40,5 @@ amanaje:
     status-topic: ${MQTT_STATUS_TOPIC:app/estacoes/+/status}
     command-topic-pattern: ${MQTT_COMMAND_TOPIC_PATTERN:app/estacoes/%s/alertas}
     evaluate-risk-on-message: ${MQTT_EVALUATE_RISK:true}
+    connection-timeout-seconds: ${MQTT_CONNECTION_TIMEOUT_SECONDS:5}
+    keep-alive-interval-seconds: ${MQTT_KEEP_ALIVE_INTERVAL_SECONDS:30}

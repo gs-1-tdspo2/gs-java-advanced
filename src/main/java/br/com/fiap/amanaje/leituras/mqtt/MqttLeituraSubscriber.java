@@ -1,6 +1,8 @@
 package br.com.fiap.amanaje.leituras.mqtt;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import br.com.fiap.amanaje.leituras.dto.LeituraIotCreateRequest;
@@ -37,6 +39,7 @@ public class MqttLeituraSubscriber implements ApplicationRunner, DisposableBean 
 	private final MqttStatusService statusService;
 	private final MqttComandoAlertaPublisher comandoAlertaPublisher;
 	private final MqttComandoAlertaPayloadFactory comandoAlertaPayloadFactory;
+	private final ExecutorService mqttExecutor;
 	private MqttClient client;
 
 	public MqttLeituraSubscriber(
@@ -54,6 +57,11 @@ public class MqttLeituraSubscriber implements ApplicationRunner, DisposableBean 
 		this.statusService = statusService;
 		this.comandoAlertaPublisher = comandoAlertaPublisher;
 		this.comandoAlertaPayloadFactory = comandoAlertaPayloadFactory;
+		this.mqttExecutor = Executors.newSingleThreadExecutor(runnable -> {
+			Thread thread = new Thread(runnable, "amanaje-mqtt-subscriber");
+			thread.setDaemon(true);
+			return thread;
+		});
 	}
 
 	@Override
@@ -62,6 +70,16 @@ public class MqttLeituraSubscriber implements ApplicationRunner, DisposableBean 
 			LOGGER.info("MQTT desabilitado. Nenhuma conexão com broker será iniciada.");
 			return;
 		}
+		LOGGER.info("Inicialização MQTT agendada em background broker={} telemetryTopic={} statusTopic={} clientId={} evaluateRisk={}",
+				properties.getBrokerUrl(),
+				properties.getTelemetryTopic(),
+				properties.getStatusTopic(),
+				properties.getClientId(),
+				properties.isEvaluateRiskOnMessage());
+		mqttExecutor.submit(this::connectAndSubscribe);
+	}
+
+	private void connectAndSubscribe() {
 		try {
 			client = new MqttClient(properties.getBrokerUrl(), properties.getClientId(), new MemoryPersistence());
 			client.setCallback(callback());
@@ -87,6 +105,8 @@ public class MqttLeituraSubscriber implements ApplicationRunner, DisposableBean 
 		MqttConnectOptions options = new MqttConnectOptions();
 		options.setCleanSession(true);
 		options.setAutomaticReconnect(true);
+		options.setConnectionTimeout(properties.getConnectionTimeoutSeconds());
+		options.setKeepAliveInterval(properties.getKeepAliveIntervalSeconds());
 		if (StringUtils.hasText(properties.getUsername())) {
 			options.setUserName(properties.getUsername());
 		}
@@ -275,6 +295,7 @@ public class MqttLeituraSubscriber implements ApplicationRunner, DisposableBean 
 
 	@Override
 	public void destroy() throws Exception {
+		mqttExecutor.shutdownNow();
 		if (client != null && client.isConnected()) {
 			client.disconnect();
 			client.close();

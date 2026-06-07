@@ -14,6 +14,8 @@ public class MqttProperties {
 	private String statusTopic = "app/estacoes/+/status";
 	private String commandTopicPattern = "app/estacoes/%s/alertas";
 	private boolean evaluateRiskOnMessage = true;
+	private int connectionTimeoutSeconds = 5;
+	private int keepAliveIntervalSeconds = 30;
 
 	public boolean isEnabled() {
 		return enabled;
@@ -85,6 +87,22 @@ public class MqttProperties {
 
 	public void setEvaluateRiskOnMessage(boolean evaluateRiskOnMessage) {
 		this.evaluateRiskOnMessage = evaluateRiskOnMessage;
+	}
+
+	public int getConnectionTimeoutSeconds() {
+		return connectionTimeoutSeconds;
+	}
+
+	public void setConnectionTimeoutSeconds(int connectionTimeoutSeconds) {
+		this.connectionTimeoutSeconds = connectionTimeoutSeconds;
+	}
+
+	public int getKeepAliveIntervalSeconds() {
+		return keepAliveIntervalSeconds;
+	}
+
+	public void setKeepAliveIntervalSeconds(int keepAliveIntervalSeconds) {
+		this.keepAliveIntervalSeconds = keepAliveIntervalSeconds;
 	}
 
 }
