@@ -110,7 +110,7 @@ Representa a visão macro da solução Amanajé, mostrando a integração entre 
 Representa as principais classes de domínio da API Java, incluindo entidades, herança com `EntidadeAuditavel`, composição com `DadosRedeEstacao` e os relacionamentos principais entre clientes, regiões, estações, leituras, avaliações de risco e alertas.
 
 <p align="center">
-  <img src="docs/images/amanaje-class-diagram.png" alt="Diagrama de classes Amanajé" width="900">
+  <img src="docs/images/amanaje-diagram.png" alt="Diagrama de classes Amanajé" width="900">
 </p>
 
 ### Diagrama de relacionamento
@@ -120,7 +120,6 @@ Representa o relacionamento entre as tabelas Oracle utilizadas pela aplicação,
 <p align="center">
   <img src="docs/images/amanaje-er-diagram.png" alt="Diagrama de relacionamento Amanajé" width="900">
 </p>
----
 
 ## Perfis da aplicação
 
