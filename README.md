@@ -96,14 +96,30 @@ src/main/java/br/com/fiap/amanaje
 
 ---
 
-## Diagrama da arquitetura
 
-A arquitetura macro do Amanajé representa a integração entre os principais módulos da solução: sensores IoT simulados no Wokwi, comunicação MQTT via HiveMQ, API Java Spring Boot, banco Oracle FIAP, serviço .NET/C# para dados climáticos externos, frontend/mobile e deploy em nuvem.
+### Diagrama de arquitetura
+
+Representa a visão macro da solução Amanajé, mostrando a integração entre ESP32/Wokwi, HiveMQ MQTT, API Java Spring Boot, Oracle FIAP, serviço .NET/C# de dados climáticos externos, frontend/mobile e deploy no Render.
 
 <p align="center">
-  <img src="docs/images/amanaje-diagram.png" alt="Diagrama da arquitetura Amanajé" width="900">
+  <img src="docs/images/amanaje-architecture-diagram.png" alt="Diagrama de arquitetura Amanajé" width="900">
 </p>
 
+### Diagrama de classes
+
+Representa as principais classes de domínio da API Java, incluindo entidades, herança com `EntidadeAuditavel`, composição com `DadosRedeEstacao` e os relacionamentos principais entre clientes, regiões, estações, leituras, avaliações de risco e alertas.
+
+<p align="center">
+  <img src="docs/images/amanaje-class-diagram.png" alt="Diagrama de classes Amanajé" width="900">
+</p>
+
+### Diagrama de relacionamento
+
+Representa o relacionamento entre as tabelas Oracle utilizadas pela aplicação, incluindo chaves primárias, chaves estrangeiras e vínculos entre clientes, usuários, regiões monitoradas, estações IoT, leituras, observações climáticas, avaliações de risco, alertas e indicadores regionais.
+
+<p align="center">
+  <img src="docs/images/amanaje-er-diagram.png" alt="Diagrama de relacionamento Amanajé" width="900">
+</p>
 ---
 
 ## Perfis da aplicação
