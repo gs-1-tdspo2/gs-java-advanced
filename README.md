@@ -79,19 +79,6 @@ src/main/java/br/com/fiap/amanaje
 ├── usuarios
 └── AmanajeApiApplication.java
 ```
-
----
-
-## Documentação da entrega
-
-Os principais documentos da entrega Java Advanced estão disponíveis na pasta `docs/`:
-
-| Documento                                                         | Descrição                                                                                                                   |
-| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| [Arquitetura da Solução](docs/arquitetura.md)                     | Explica a arquitetura da API, camadas, módulos, integrações, fluxo IoT, Oracle, Swagger e Render.                           |
-| [Modelagem Avançada Java](docs/modelagem-avancada-java.md)        | Documenta o uso de `@MappedSuperclass`, `@Embeddable`, múltiplas tabelas e a decisão sobre consistência composta no Oracle. |
-| [DDL Oracle Amanajé](docs/database/AMANAJE_boot-setup_DDL_v3.sql) | Script DDL utilizado como fonte de verdade para o schema Oracle do projeto.                                                 |
-
 ---
 
 ### Camadas principais
@@ -106,6 +93,16 @@ Os principais documentos da entrega Java Advanced estão disponíveis na pasta `
 | `mqtt`       | Contém subscriber, publisher e payloads para integração com HiveMQ/Wokwi |
 | `exception`  | Tratamento centralizado de erros                                         |
 | `config`     | Configurações da aplicação, CORS, Swagger/OpenAPI e propriedades         |
+
+---
+
+## Diagrama da arquitetura
+
+A arquitetura macro do Amanajé representa a integração entre os principais módulos da solução: sensores IoT simulados no Wokwi, comunicação MQTT via HiveMQ, API Java Spring Boot, banco Oracle FIAP, serviço .NET/C# para dados climáticos externos, frontend/mobile e deploy em nuvem.
+
+<p align="center">
+  <img src="docs/images/amanaje-diagram.png" alt="Diagrama da arquitetura Amanajé" width="900">
+</p>
 
 ---
 
@@ -194,7 +191,7 @@ http://localhost:8080/api/health
 
 ---
 
-## Swagger / OpenAPI
+## Swagger / OpenAPI / Videos
 
 Com a aplicação em execução localmente, a documentação Swagger pode ser acessada em:
 
@@ -406,13 +403,14 @@ DELETE /api/recurso/{id}
 
 ---
 
+
 ## Evidências dos endpoints de regiões
 
 <details>
   <summary><strong>POST /api/regioes</strong></summary>
 
   <p align="center">
-    <img src="docs/images/regioes-post.png" alt="Evidência POST regiões" width="900">
+    <img src="docs/images/regiao-post.png" alt="Evidência POST regiões" width="900">
   </p>
 </details>
 
@@ -420,7 +418,7 @@ DELETE /api/recurso/{id}
   <summary><strong>GET /api/regioes</strong></summary>
 
   <p align="center">
-    <img src="docs/images/regioes-get.png" alt="Evidência GET regiões" width="900">
+    <img src="docs/images/regiao-get.png" alt="Evidência GET regiões" width="900">
   </p>
 </details>
 
@@ -428,7 +426,7 @@ DELETE /api/recurso/{id}
   <summary><strong>PUT /api/regioes/{id}</strong></summary>
 
   <p align="center">
-    <img src="docs/images/regioes-put.png" alt="Evidência PUT regiões" width="900">
+    <img src="docs/images/regiao-put.png" alt="Evidência PUT regiões" width="900">
   </p>
 </details>
 
@@ -436,7 +434,7 @@ DELETE /api/recurso/{id}
   <summary><strong>DELETE /api/regioes/{id}</strong></summary>
 
   <p align="center">
-    <img src="docs/images/regioes-delete.png" alt="Evidência DELETE regiões" width="900">
+    <img src="docs/images/regiao-delete.png" alt="Evidência DELETE regiões" width="900">
   </p>
 </details>
 
@@ -454,7 +452,7 @@ DELETE /api/recurso/{id}
   <summary><strong>GET /api/regioes/{id}/leituras</strong></summary>
 
   <p align="center">
-    <img src="docs/images/leituras-regiao-get.png" alt="Evidência GET leituras por região" width="900">
+    <img src="docs/images/leituras-get.png" alt="Evidência GET leituras por região" width="900">
   </p>
 </details>
 
@@ -472,8 +470,9 @@ DELETE /api/recurso/{id}
   <summary><strong>PUT /api/alertas/{id}/resolver</strong></summary>
 
   <p align="center">
-    <img src="docs/images/alertas-resolver-put.png" alt="Evidência PUT resolver alerta" width="900">
+    <img src="docs/images/aletras-put.png" alt="Evidência PUT resolver alerta" width="900">
   </p>
 </details>
+
 
 ---
