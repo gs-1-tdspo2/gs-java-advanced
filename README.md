@@ -802,6 +802,8 @@ A API implementa os principais requisitos técnicos:
 | Repositório GitHub                | https://github.com/gs-1-tdspo2/gs-java-advanced |
 | Deploy público                    | https://gs-java-advanced.onrender.com |
 | Swagger/OpenAPI                   | https://gs-java-advanced.onrender.com/swagger-ui/index.html#/ |
+| Roteiro do vídeo Java Advanced    | docs/video-roteiro-java-advanced.md |
+| Fluxo de demo no Swagger          | docs/swagger-demo-flow.md |
 | Vídeo de apresentação Java Advanced | INSERIR_LINK_DO_VIDEO |
 | Vídeo Pitch                       | INSERIR_LINK_DO_PITCH |
 
