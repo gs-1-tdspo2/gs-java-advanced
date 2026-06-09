@@ -223,7 +223,7 @@ https://gs-java-advanced.onrender.com/swagger-ui/index.html
 Link da apresentação:
 
 ```text
-https://gs-java-advanced.onrender.com/swagger-ui/index.html
+https://youtu.be/PtuLZCcTtBs
 ```
 
 Link do pitch:
