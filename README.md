@@ -229,7 +229,7 @@ https://youtu.be/PtuLZCcTtBs
 Link do pitch:
 
 ```text
-https://gs-java-advanced.onrender.com/swagger-ui/index.html
+https://www.youtube.com/watch?v=FsEnBDvXBbs
 ```
 
 ---
